@@ -1,4 +1,4 @@
-import { Row, Col } from "antd";
+import { Col } from "antd";
 import React from "react";
 import {
     WrapperHeader,
@@ -6,7 +6,6 @@ import {
     WrapperTextHeader,
     WrapperTextHeaderSmall,
 } from "./style";
-import Search from "antd/es/transfer/search";
 import {
     UserOutlined,
     CaretDownOutlined,
@@ -16,7 +15,7 @@ import ButtonInputSearch from "../ButtonInputSearch/ButtonInputSearch";
 const HeaderComponent = () => {
     return (
         <div>
-            <WrapperHeader gutter={16}>
+            <WrapperHeader>
                 <Col span={6}>
                     <WrapperTextHeader>SHOP</WrapperTextHeader>
                 </Col>
