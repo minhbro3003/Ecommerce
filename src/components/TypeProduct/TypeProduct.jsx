@@ -1,9 +1,9 @@
 import React from "react";
 
-const TypeProduct = () => {
+const TypeProduct = ({ name }) => {
     return (
         <div>
-            <>TypeProduct</>
+            <>{name}</>
         </div>
     );
 };

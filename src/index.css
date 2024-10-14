@@ -1,9 +1,12 @@
-/* body {
+@import "slick-carousel/slick/slick.css";
+@import "slick-carousel/slick/slick-theme.css";
+@import "antd/dist/reset.css";
+body {
     margin: 10;
     box-sizing: border-box;
     padding: 10;
 }
 
 html {
-    font-size: 66.5%;
-} */
+    font-size: 100%;
+}
