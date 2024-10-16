@@ -3,8 +3,13 @@ import ProductDetailComponent from "../../components/ProductDetailComponent/Prod
 
 const ProductDetailsPage = () => {
     return (
-        <div style={{ padding: "0 120px", background: "#efefef" }}>
-            <h1>Trang chu</h1>
+        <div
+            style={{
+                padding: "0 120px",
+                background: "#efefef",
+                height: "1200px",
+            }}
+        >
             <ProductDetailComponent />
         </div>
     );

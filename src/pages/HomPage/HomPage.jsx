@@ -14,7 +14,7 @@ import CardComponent from "../../components/CardComponent/CardComponent";
 const HomPage = () => {
     const arr = ["TV", "Tu Lanh", "Laptop"];
     return (
-        <>
+        <div style={{ marginTop: "60px" }}>
             <div style={{ padding: "0 120px" }}>
                 <WrapperTypeProduct>
                     {arr.map((item) => {
@@ -63,7 +63,7 @@ const HomPage = () => {
                     />
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 

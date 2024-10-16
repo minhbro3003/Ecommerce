@@ -2,9 +2,18 @@ import { Row } from "antd";
 import styled from "styled-components";
 
 export const WrapperHeader = styled(Row)`
+    // padding: 10px 120px;
+    // background-color: #00a0ff;
+    // align-items: center;
     padding: 10px 120px;
     background-color: #00a0ff;
     align-items: center;
+    position: fixed; // Đặt header ở vị trí cố định
+    top: 0; // Đặt nó ở trên cùng của trang
+    left: 0;
+    right: 0;
+    z-index: 1000; // Z-index lớn để nó nằm trên các nội dung khác
+    width: 100%; // Đảm bảo header bao phủ toàn bộ chiều rộng của trang
 `;
 
 export const WrapperTextHeader = styled.span`

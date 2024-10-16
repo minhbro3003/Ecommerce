@@ -11,12 +11,13 @@ const TypeProductPage = () => {
             style={{
                 padding: "0 120px",
                 background: "#efefef",
+                marginTop: "60px",
             }}
         >
             <Row
                 style={{
                     flexWrap: "nowrap",
-                    paddingTop: "20px",
+                    paddingTop: "30px",
                 }}
             >
                 <WrapperNavbar span={4}>
@@ -36,7 +37,7 @@ const TypeProductPage = () => {
                         style={{
                             display: "flex",
                             justifyContent: "center",
-                            marginTop: "20px",
+                            margin: "30px 0 50px",
                         }}
                         defaultCurrent={2}
                         total={100}

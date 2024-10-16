@@ -14,12 +14,17 @@ import {
 import ButtonInputSearch from "../ButtonInputSearch/ButtonInputSearch";
 const HeaderComponent = () => {
     return (
-        <div>
+        <div
+            style={{
+                width: "100%",
+                background: "rgb(26, 148, 255",
+            }}
+        >
             <WrapperHeader>
-                <Col span={6}>
+                <Col span={5}>
                     <WrapperTextHeader>SHOP</WrapperTextHeader>
                 </Col>
-                <Col span={12}>
+                <Col span={13}>
                     <ButtonInputSearch
                         placeholder="input search text"
                         textButton="Tìm kiếm"
@@ -27,7 +32,14 @@ const HeaderComponent = () => {
                         loading
                     />
                 </Col>
-                <Col span={6} style={{ display: "flex", gap: "15px" }}>
+                <Col
+                    span={6}
+                    style={{
+                        display: "flex",
+                        gap: "15px",
+                        alignItems: "center",
+                    }}
+                >
                     <WrapperHeaderAccount>
                         <UserOutlined style={{ fontSize: "30px" }} />
                         <div>

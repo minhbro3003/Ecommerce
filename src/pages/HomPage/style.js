@@ -3,7 +3,7 @@ import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
 
 export const WrapperTypeProduct = styled.div`
     display: flex;
-    border-bottom: 1px solid green;
+    // border-bottom: 1px solid green;
     align-items: center;
     gap: 25px;
     justify-content: flex-start;
@@ -23,7 +23,7 @@ export const WrapperButtonMore = styled(ButtonComponent)`
 export const WrapperProducts = styled.div`
     margin-top: 20px;
     display: flex;
-    justify-content: center;
-    gap: 20px;
+    // justify-content: center;
+    gap: 15px;
     flex-wrap: wrap;
 `;
