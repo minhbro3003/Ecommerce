@@ -4,25 +4,25 @@ const { genneralAccessToken, genneralFefreshToken } = require("./JwtService");
 
 const createUser = (newUser) => {
     return new Promise(async (resolve, reject) => {
-        const { name, email, password, confirmPassword, phone } = newUser;
+        const { email, password, confirmPassword } = newUser;
         try {
             const checkUser = await User.findOne({
                 email: email,
             });
             if (checkUser !== null) {
                 resolve({
-                    status: "OK",
+                    status: "ERR",
                     message: "The email is already",
                 });
             }
             const hash = bcrypt.hashSync(password, 10);
             console.log("hash:", hash);
             const createdUser = await User.create({
-                name,
+                // name,
                 email,
                 password: hash,
                 // confirmPassword: hash,
-                phone,
+                // phone,
             });
             if (createdUser) {
                 resolve({
@@ -39,14 +39,16 @@ const createUser = (newUser) => {
 
 const loginUser = (userLogin) => {
     return new Promise(async (resolve, reject) => {
-        const { name, email, password, confirmPassword, phone } = userLogin;
+        const { email, password } = userLogin;
+        // console.log("email:", email);
         try {
             const checkUser = await User.findOne({
                 email: email,
             });
+            // console.log("checkUser:", checkUser);
             if (checkUser === null) {
                 resolve({
-                    status: "OK",
+                    status: "ERR",
                     message: "The user is not defined",
                 });
             }
@@ -56,17 +58,9 @@ const loginUser = (userLogin) => {
             );
             console.log("comparePassword: ", comparePassword);
 
-            // const createdUser = await User.create({
-            //     name,
-            //     email,
-            //     password: hash,
-            //     // confirmPassword: hash,
-            //     phone,
-            // });
-            // if (createdUser) {
             if (!comparePassword) {
                 resolve({
-                    status: "OK",
+                    status: "ERR",
                     message: "The password or user is incorrect",
                 });
             }
@@ -76,6 +70,7 @@ const loginUser = (userLogin) => {
                 id: checkUser.id,
                 isAdmin: checkUser.isAdmin,
             });
+            // console.log(" access token: ", access_token);
 
             // refresh token
             const refresh_token = await genneralFefreshToken({
@@ -90,7 +85,6 @@ const loginUser = (userLogin) => {
                 access_token,
                 refresh_token,
             });
-            // }
         } catch (e) {
             reject(e);
         }
