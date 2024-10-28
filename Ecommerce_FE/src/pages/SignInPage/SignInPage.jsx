@@ -12,7 +12,6 @@ import imageLogo from "../../assets/images/login.png";
 import { useNavigate } from "react-router";
 import * as UserService from "../../services/UserSevice";
 import { useMutationHooks } from "../../hooks/useMutationHook";
-import Loading from "../../components/LoadingComponent/Loading";
 
 const SignInPage = () => {
     const [isShowPassword, setIsShowPassword] = useState(false);
@@ -25,6 +24,7 @@ const SignInPage = () => {
     console.log("mutation", mutation);
 
     const { data, isLoading } = mutation;
+    console.log("object,", isLoading);
 
     const handleOnChangeEmail = (value) => {
         setEmail(value);
@@ -98,7 +98,6 @@ const SignInPage = () => {
                     {data?.status === "ERR" && (
                         <span style={{ color: "red" }}>{data?.message}</span>
                     )}
-                    {/* <Loading isLoading={isLoading}> */}
                     <ButtonComponent
                         disabled={!email.length || !password.length}
                         onClick={handldSignIn}
@@ -112,7 +111,6 @@ const SignInPage = () => {
                         }}
                         textButton="Đăng nhập"
                     ></ButtonComponent>
-                    {/* </Loading> */}
                     <p>
                         <WrapperTextLight>Quên mật khẩu?</WrapperTextLight>
                     </p>

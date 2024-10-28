@@ -10,11 +10,11 @@ export const useSlide = createSlice({
     initialState,
     reducers: {
         updateUser: (state, action) => {
-            const { name, email, access_token } = action.payload;
+            // const { name, email, access_token } = action.payload;
             console.log("action", action);
-            state.name = name || email;
-            state.email = email;
-            state.access_token = access_token;
+            // state.name = name || email;
+            // state.email = email;
+            // state.access_token = access_token;
         },
     },
 });
