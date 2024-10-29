@@ -52,7 +52,13 @@ const loginUser = async (req, res) => {
 
         // console.log("isCheckEmail", isCheckEmail);
         const user = await UserService.loginUser(req.body);
-        return res.status(200).json(user);
+        const { refresh_token, ...newUser } = user;
+        // console.log("user", user);
+        res.cookie("refresh_token", refresh_token, {
+            HttpOnly: true,
+            Secure: true,
+        });
+        return res.status(200).json(newUser);
     } catch (e) {
         return res.status(404).json({
             message: "User creation failed",
@@ -139,8 +145,9 @@ const getDetailsUser = async (req, res) => {
 };
 
 const refreshToken = async (req, res) => {
+    // console.log("req.cookei", req.cookies);
     try {
-        const token = req.headers.token.split(" ")[1];
+        const token = req.cookies.refresh_token;
 
         if (!token) {
             return res.status(200).json({
