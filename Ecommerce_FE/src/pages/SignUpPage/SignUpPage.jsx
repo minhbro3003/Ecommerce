@@ -32,12 +32,20 @@ const SignUpPage = () => {
 
     useEffect(() => {
         if (isSuccess) {
-            handleNavigateSignIn();
             message.success();
+            handleNavigateSignIn();
         } else if (isError) {
             message.error();
         }
     }, [isSuccess, isError]);
+    // useEffect(() => {
+    //     if (isSuccess) {
+    //         handleNavigateSignIn();
+    //         message.success();
+    //     } else if (isError) {
+    //         message.error();
+    //     }
+    // }, [isSuccess, isError]);
     const handleOnChangeEmail = (value) => {
         setEmail(value);
     };
