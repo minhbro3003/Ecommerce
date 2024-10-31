@@ -41,12 +41,12 @@ const loginUser = async (req, res) => {
 
         if (!email || !password) {
             return res
-                .status(200)
+                .status(400)
                 .json({ status: "ERR", message: "The input is required." });
         } else if (!isCheckEmail) {
             // check email
             return res
-                .status(200)
+                .status(400)
                 .json({ status: "ERR", message: "The input is email." });
         }
 
@@ -55,8 +55,9 @@ const loginUser = async (req, res) => {
         const { refresh_token, ...newUser } = user;
         // console.log("user", user);
         res.cookie("refresh_token", refresh_token, {
-            HttpOnly: true,
-            Secure: true,
+            httpOnly: true,
+            secure: false,
+            samesite: "strict",
         });
         return res.status(200).json(newUser);
     } catch (e) {
@@ -145,7 +146,7 @@ const getDetailsUser = async (req, res) => {
 };
 
 const refreshToken = async (req, res) => {
-    // console.log("req.cookei", req.cookies);
+    console.log("req.cookies.refresh_token: ", req.cookies.refresh_token);
     try {
         const token = req.cookies.refresh_token;
 
@@ -166,6 +167,21 @@ const refreshToken = async (req, res) => {
     }
 };
 
+const logoutUser = async (req, res) => {
+    try {
+        res.clearCookie(`refresh_token`);
+        return res.status(200).json({
+            status: "OK",
+            message: "Logout successfully",
+        });
+    } catch (e) {
+        return res.status(404).json({
+            message: "! User creation failed 'SOS'!",
+            error: e.message,
+        });
+    }
+};
+
 module.exports = {
     createUser,
     loginUser,
@@ -174,4 +190,5 @@ module.exports = {
     getAllUsers,
     getDetailsUser,
     refreshToken,
+    logoutUser,
 };

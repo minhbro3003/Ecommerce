@@ -9,7 +9,7 @@ const genneralAccessToken = async (payload) => {
             ...payload,
         },
         process.env.ACCESS_TOKEN,
-        { expiresIn: "1h" }
+        { expiresIn: "30s" }
     );
     return access_token;
 };
@@ -38,15 +38,14 @@ const refreshTokenJwtService = async (token) => {
                     });
                 }
                 console.log("user", user);
-                const { payload } = user;
                 const access_token = await genneralAccessToken({
-                    id: payload?.id,
-                    isAdmin: payload?.isAdmin,
+                    id: user?.id,
+                    isAdmin: user?.isAdmin,
                 });
                 console.log("access_token", access_token);
                 resolve({
                     status: "OK",
-                    message: "User successfully",
+                    message: "Token refreshed successfully",
                     access_token,
                 });
             });
