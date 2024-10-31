@@ -32,9 +32,10 @@ const SignInPage = () => {
     console.log("object,", isLoading);
 
     useEffect(() => {
+        console.log("isSuccess", isSuccess);
         if (isSuccess) {
             navigate("/");
-            // console.log("data", data);
+            console.log("data", data);
             localStorage.setItem("access_token", data?.access_token);
             if (data?.access_token) {
                 const decoded = jwtDecode(data?.access_token);
@@ -47,6 +48,7 @@ const SignInPage = () => {
     }, [isSuccess]);
 
     const handleGetDetailsUser = async (id, token) => {
+        console.log("Getting user details for ID:", id);
         const res = await UserService.getDetailsUser(id, token);
         dispatch(updateUser({ ...res?.data, access_token: token }));
         console.log("res", res);

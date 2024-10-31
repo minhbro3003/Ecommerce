@@ -1,6 +1,7 @@
-import { Badge, Col } from "antd";
-import React from "react";
+import { Badge, Button, Col, Popover } from "antd";
+import React, { useState } from "react";
 import {
+    WrapperContentPopup,
     WrapperHeader,
     WrapperHeaderAccount,
     WrapperTextHeader,
@@ -13,16 +14,40 @@ import {
 } from "@ant-design/icons";
 import ButtonInputSearch from "../ButtonInputSearch/ButtonInputSearch";
 import { useNavigate } from "react-router";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import * as UserService from "../../services/UserSevice";
+import { resetUser } from "../../redux/slides/useSlide";
+import Loading from "../LoadingComponent/Loading";
 
 const HeaderComponent = () => {
     const navigate = useNavigate();
+    const dispath = useDispatch();
+    const [loading, setLoading] = useState(false);
     const user = useSelector((state) => state.user);
     console.log("user count: ", user);
 
     const handleNavigateLogin = () => {
         navigate("/sign-in");
     };
+
+    const handleLogout = async () => {
+        setLoading(true);
+        await UserService.logoutUser();
+        dispath(resetUser());
+        setLoading(false);
+    };
+
+    const content = (
+        <div>
+            <WrapperContentPopup onClick={handleLogout}>
+                Đăng xuất
+            </WrapperContentPopup>
+            <WrapperContentPopup onClick={() => navigate("/profile-user")}>
+                Thông tin người dùng
+            </WrapperContentPopup>
+        </div>
+    );
+
     return (
         <div
             style={{
@@ -50,27 +75,38 @@ const HeaderComponent = () => {
                         alignItems: "center",
                     }}
                 >
-                    <WrapperHeaderAccount>
-                        <UserOutlined style={{ fontSize: "30px" }} />
-                        {user?.name ? (
-                            <div style={{ cursor: "pointer" }}>{user.name}</div>
-                        ) : (
-                            <div
-                                onClick={handleNavigateLogin}
-                                style={{ cursor: "pointer" }}
-                            >
-                                <WrapperTextHeaderSmall>
-                                    Đăng nhập/ Đăng ký
-                                </WrapperTextHeaderSmall>
-                                <div>
+                    <Loading isLoading={loading}>
+                        <WrapperHeaderAccount>
+                            <UserOutlined style={{ fontSize: "30px" }} />
+                            {user?.access_token ? (
+                                <>
+                                    <Popover content={content} trigger="click">
+                                        <div style={{ cursor: "pointer" }}>
+                                            {user.name ||
+                                                user.email ||
+                                                user.email ||
+                                                "User"}
+                                        </div>
+                                    </Popover>
+                                </>
+                            ) : (
+                                <div
+                                    onClick={handleNavigateLogin}
+                                    style={{ cursor: "pointer" }}
+                                >
                                     <WrapperTextHeaderSmall>
-                                        Tài khoản
+                                        Đăng nhập/ Đăng ký
                                     </WrapperTextHeaderSmall>
-                                    <CaretDownOutlined />
+                                    <div>
+                                        <WrapperTextHeaderSmall>
+                                            Tài khoản
+                                        </WrapperTextHeaderSmall>
+                                        <CaretDownOutlined />
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                    </WrapperHeaderAccount>
+                            )}
+                        </WrapperHeaderAccount>
+                    </Loading>
                     <div>
                         <Badge count={4} size="small">
                             <ShoppingCartOutlined
