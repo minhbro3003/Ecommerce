@@ -1,5 +1,5 @@
-import { Badge, Button, Col, Popover } from "antd";
-import React, { useState } from "react";
+import { Badge, Col, Popover } from "antd";
+import React, { useEffect, useState } from "react";
 import {
     WrapperContentPopup,
     WrapperHeader,
@@ -22,6 +22,8 @@ import Loading from "../LoadingComponent/Loading";
 const HeaderComponent = () => {
     const navigate = useNavigate();
     const dispath = useDispatch();
+    const [userName, setUserName] = useState("");
+    const [userAvartar, setUserAvartar] = useState("");
     const [loading, setLoading] = useState(false);
     const user = useSelector((state) => state.user);
     console.log("user count: ", user);
@@ -37,6 +39,13 @@ const HeaderComponent = () => {
         setLoading(false);
     };
 
+    useEffect(() => {
+        setLoading(true);
+        setUserName(user?.name);
+        setUserAvartar(user?.avartar);
+        setLoading(false);
+    }, [user?.name, user?.avartar]);
+
     const content = (
         <div>
             <WrapperContentPopup onClick={handleLogout}>
@@ -45,9 +54,15 @@ const HeaderComponent = () => {
             <WrapperContentPopup onClick={() => navigate("/profile-user")}>
                 Thông tin người dùng
             </WrapperContentPopup>
+            {user?.isAdmin && (
+                <WrapperContentPopup onClick={() => navigate("/system/admin")}>
+                    Quản lý hệ thống
+                </WrapperContentPopup>
+            )}
         </div>
     );
 
+    console.log("user: ", user.name.length);
     return (
         <div
             style={{
@@ -77,15 +92,29 @@ const HeaderComponent = () => {
                 >
                     <Loading isLoading={loading}>
                         <WrapperHeaderAccount>
-                            <UserOutlined style={{ fontSize: "30px" }} />
+                            {userAvartar ? (
+                                <img
+                                    src={userAvartar}
+                                    alt="avartar"
+                                    style={{
+                                        height: "30px",
+                                        width: "30px",
+                                        borderRadius: "50%",
+                                        objectFit: "cover",
+                                        border: "1px solid #fff",
+                                    }}
+                                />
+                            ) : (
+                                <UserOutlined style={{ fontSize: "30px" }} />
+                            )}
+
                             {user?.access_token ? (
                                 <>
                                     <Popover content={content} trigger="click">
                                         <div style={{ cursor: "pointer" }}>
-                                            {user.name ||
-                                                user.email ||
-                                                user.email ||
-                                                "User"}
+                                            {userName?.length
+                                                ? userName
+                                                : user?.email}
                                         </div>
                                     </Popover>
                                 </>

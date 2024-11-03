@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { routes } from "./routes";
 import DefaultComponent from "./components/DefaultComponent/DefaultComponent";
@@ -6,17 +6,23 @@ import axios from "axios";
 import { isJsonString } from "./utils";
 import { jwtDecode } from "jwt-decode";
 import * as UserService from "./services/UserSevice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "./redux/slides/useSlide";
+import Loading from "./components/LoadingComponent/Loading";
 
 export default function App() {
     const dispatch = useDispatch();
+    const [isLoading, setIsLoading] = useState(false);
+    const user = useSelector((state) => state.user);
 
     useEffect(() => {
+        setIsLoading(true);
         const { storageData, decoded } = handleDecoded();
+        console.log("Decoded Token:", decoded);
         if (decoded?.id) {
             handleGetDetailsUser(decoded?.id, storageData);
         }
+        setIsLoading(false);
     }, []);
 
     const handleDecoded = () => {
@@ -48,19 +54,28 @@ export default function App() {
     const handleGetDetailsUser = async (id, token) => {
         const res = await UserService.getDetailsUser(id, token);
         dispatch(updateUser({ ...res?.data, access_token: token }));
-        console.log("res", res);
+
+        // console.log("res", res);
     };
 
     return (
         <div>
+            {/* <Loading isLoading={{ isLoading }}> */}
             <Router>
                 <Routes>
                     {routes.map((route) => {
                         const Page = route.page;
+                        const isCheckAuth = !route.isPrivate || user.isAdmin;
+                        console.log(
+                            "isCheckAuth:",
+                            isCheckAuth,
+                            "Route:",
+                            route.path
+                        );
                         const Layout = route.isShowHeader
                             ? DefaultComponent
                             : Fragment;
-                        return (
+                        return isCheckAuth ? (
                             <Route
                                 key={route.path}
                                 path={route.path}
@@ -70,10 +85,11 @@ export default function App() {
                                     </Layout>
                                 }
                             />
-                        );
+                        ) : null;
                     })}
                 </Routes>
             </Router>
+            {/* </Loading> */}
         </div>
     );
 }
