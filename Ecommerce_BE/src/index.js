@@ -12,8 +12,11 @@ const port = process.env.PORT || 3001;
 
 //Cross-Origin Resource Sharing) là một cơ chế bảo mật trong trình duyệt mà ngăn không cho các trang web từ một nguồn (origin) khác truy cập tài nguyên từ một nguồn khác.
 app.use(cors());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser()); // Lưu trữ cookie
+
 routes(app);
 
 mongoose
