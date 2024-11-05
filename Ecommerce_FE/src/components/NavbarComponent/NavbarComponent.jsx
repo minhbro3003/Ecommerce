@@ -12,7 +12,7 @@ const NavbarComponent = () => {
     const renderContent = (type, options) => {
         switch (type) {
             case "text":
-                return options.map((option) => {
+                return options?.map((option) => {
                     return <WrapperTextValue>{option}</WrapperTextValue>;
                 });
             case "checkbox":

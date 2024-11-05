@@ -18,7 +18,7 @@ export default function App() {
     useEffect(() => {
         setIsLoading(true);
         const { storageData, decoded } = handleDecoded();
-        console.log("Decoded Token:", decoded);
+        // console.log("Decoded Token:", decoded);
         if (decoded?.id) {
             handleGetDetailsUser(decoded?.id, storageData);
         }
@@ -28,7 +28,7 @@ export default function App() {
     const handleDecoded = () => {
         let storageData = localStorage.getItem("access_token");
         let decoded = {};
-        console.log("storage data:", storageData, isJsonString(storageData));
+        // console.log("storage data:", storageData, isJsonString(storageData));
         if (storageData && isJsonString(storageData)) {
             storageData = JSON.parse(storageData);
             decoded = jwtDecode(storageData);
@@ -66,12 +66,6 @@ export default function App() {
                     {routes.map((route) => {
                         const Page = route.page;
                         const isCheckAuth = !route.isPrivate || user.isAdmin;
-                        console.log(
-                            "isCheckAuth:",
-                            isCheckAuth,
-                            "Route:",
-                            route.path
-                        );
                         const Layout = route.isShowHeader
                             ? DefaultComponent
                             : Fragment;

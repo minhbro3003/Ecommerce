@@ -26,7 +26,7 @@ const SignInPage = () => {
     const navigate = useNavigate();
 
     const mutation = useMutationHooks((data) => UserService.loginUser(data));
-    console.log("mutation", mutation);
+    // console.log("mutation", mutation);
 
     const { data, isLoading, isSuccess } = mutation;
     console.log("object,", isLoading);
@@ -62,7 +62,7 @@ const SignInPage = () => {
     };
     const handldSignIn = () => {
         mutation.mutate({ email, password });
-        console.log("signin", email, password);
+        // console.log("signin", email, password);
     };
 
     const handleNavigateSignUp = () => {
