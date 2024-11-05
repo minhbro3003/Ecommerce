@@ -55,7 +55,7 @@ const updateProduct = (id, data) => {
             });
             resolve({
                 status: "OK",
-                message: "Success",
+                message: "Updata Product Success",
                 data: updatedProduct,
             });
         } catch (e) {

@@ -31,7 +31,7 @@ const updateProduct = async (req, res) => {
                 message: "The productId is required",
             });
         }
-        console.log("productId", productId);
+        // console.log("productId", productId);
         const user = await ProductService.updateProduct(productId, data);
 
         return res.status(200).json(user);
