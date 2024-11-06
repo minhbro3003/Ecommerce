@@ -34,6 +34,7 @@ const HeaderComponent = ({ isHidenSearch = false, isHidenCart = false }) => {
 
     const handleLogout = async () => {
         setLoading(true);
+        navigate("/");
         await UserService.logoutUser();
         dispath(resetUser());
         setLoading(false);

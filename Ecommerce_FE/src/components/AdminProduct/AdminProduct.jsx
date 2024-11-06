@@ -1,6 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { Button, Form, Modal } from "antd";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import React, { useEffect, useRef, useState } from "react";
+import { Button, Form, Space } from "antd";
+import {
+    DeleteOutlined,
+    EditOutlined,
+    PlusOutlined,
+    SearchOutlined,
+} from "@ant-design/icons";
 import TableComponent from "../TableComponent/TableComponent";
 import { WrapperHeader } from "./style";
 import InputComponent from "../InputComponent/InputComponent";
@@ -14,13 +19,19 @@ import { useQuery } from "@tanstack/react-query";
 import DrawerComponent from "../DrawerComponent/DrawerComponent";
 import Loading from "../LoadingComponent/Loading";
 import { useSelector } from "react-redux";
+import ModalComponent from "../ModalComponent/ModalComponent";
 
 const AdminProduct = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [rowSelected, setRowSelected] = useState("");
     const [isOpenDrawer, setIsOpenDrawer] = useState(false);
     const user = useSelector((state) => state?.user);
+    const [isModalDelete, setIsModalDelete] = useState(false);
     const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
+
+    const [searchText, setSearchText] = useState("");
+    const [searchedColumn, setSearchedColumn] = useState("");
+    const searchInput = useRef(null);
 
     const [stateProduct, setStateProduct] = useState({
         name: "",
@@ -42,7 +53,8 @@ const AdminProduct = () => {
         image: "",
     });
 
-    const mutation = useMutationHooks((data) => {
+    //create product
+    const mutationCreate = useMutationHooks((data) => {
         const { name, type, countInStock, price, rating, description, image } =
             data;
         const res = ProductService.createProduct({
@@ -61,19 +73,27 @@ const AdminProduct = () => {
     const mutationUpdate = useMutationHooks((data) => {
         console.log("data Updat:", data);
         const { id, token, ...rests } = data;
-        const res = ProductService.updateProduct(id, token, rests);
+        const res = ProductService.updateProduct(id, token, { ...rests });
+        return res;
+    });
+
+    //delete product
+    const mutationDelete = useMutationHooks((data) => {
+        const { id, token } = data;
+        const res = ProductService.deleteProduct(id, token);
         return res;
     });
 
     const getAllProducts = async () => {
         const res = await ProductService.getAllProduct();
-        console.log("res: ", res);
+        // console.log("res: ", res);
         return res;
     };
 
     const [form] = Form.useForm();
 
-    const { data, isSuccess, isError } = mutation;
+    const { data, isSuccess, isError } = mutationCreate;
+
     //update product
     const {
         data: dataUpdated,
@@ -81,32 +101,54 @@ const AdminProduct = () => {
         isSuccess: isSuccessUpdated,
         isError: isErrorUpdated,
     } = mutationUpdate;
-    // console.log("data", data);
 
-    const { isLoading: isLoadingProducts, data: products = [] } = useQuery({
+    //delete product
+    const {
+        data: dataDeleted,
+        isLoading: isLoadingDeleted,
+        isSuccess: isSuccessDeleted,
+        isError: isErrorDeleted,
+    } = mutationDelete;
+    // console.log("data", data);
+    const queryProduct = useQuery({
         queryKey: ["products"],
         queryFn: getAllProducts,
     });
+    const { isLoading: isLoadingProducts, data: products = [] } = queryProduct;
+
     // console.log("product: ", products);
 
+    //crete product
     useEffect(() => {
         if (isSuccess && data?.status === "OK") {
-            message.success();
+            message.success("Tạo sản phẩm thành công!");
             handleCancel();
+            mutationCreate.reset();
         } else if (isError) {
-            message.error();
+            message.error("Tạo sản phẩm thất bại!");
         }
     }, [isSuccess]);
+
+    //delete product
+    useEffect(() => {
+        if (isSuccessDeleted && dataDeleted?.status === "OK") {
+            message.success("Xóa sản phẩm thành công!");
+            handleCancelDelete();
+        } else if (isErrorDeleted) {
+            message.error("Xóa sản phẩm thất bại!");
+        }
+    }, [isSuccessDeleted]);
 
     //update product
     useEffect(() => {
         if (isSuccessUpdated && dataUpdated?.status === "OK") {
-            message.success();
+            message.success("Cập nhật thành công!");
             handleCloseDrawer();
+            mutationUpdate.reset();
         } else if (isErrorUpdated) {
-            message.error();
+            message.error("Cập nhật thất bại!");
         }
-    }, [isSuccessUpdated]);
+    }, [isSuccessUpdated, isErrorUpdated]);
 
     const handleCancel = () => {
         setIsModalOpen(false);
@@ -136,9 +178,13 @@ const AdminProduct = () => {
         form.resetFields();
     };
 
+    //create product
     const onFinish = () => {
-        mutation.mutate(stateProduct);
-        // console.log("finished", stateProduct);
+        mutationCreate.mutate(stateProduct, {
+            onSettled: () => {
+                queryProduct.refetch();
+            },
+        });
     };
 
     const handleOnChange = (e) => {
@@ -176,12 +222,18 @@ const AdminProduct = () => {
         form.setFieldsValue(stateProductDetails);
         // }
     }, [form, stateProductDetails]);
+
     //details of product
     useEffect(() => {
         if (rowSelected) {
+            setIsLoadingUpdate(true);
             fetchGetDetailsProduct(rowSelected);
         }
     }, [rowSelected]);
+
+    const handleDetailsProduct = () => {
+        setIsOpenDrawer(true);
+    };
 
     //get image product details
     const handleOnChangeImageDetails = async ({ fileList }) => {
@@ -213,18 +265,22 @@ const AdminProduct = () => {
         setIsLoadingUpdate(false);
     };
 
-    const handleDetailsProduct = () => {
-        if (rowSelected) {
-            setIsLoadingUpdate(true);
-            fetchGetDetailsProduct(rowSelected);
-            setIsOpenDrawer(true);
-        }
-
-        console.log("rowSelected", rowSelected);
+    //delete product
+    const handleCancelDelete = () => {
+        setIsModalDelete(false);
+        // console.log("handleDeteleProduct", rowSelected);
     };
 
-    const handleDeteleProduct = () => {
-        console.log("handleDeteleProduct", rowSelected);
+    //delete product
+    const handleDeleteProduct = () => {
+        mutationDelete.mutate(
+            { id: rowSelected, token: user?.access_token },
+            {
+                onSettled: () => {
+                    queryProduct.refetch();
+                },
+            }
+        );
     };
 
     const renderAction = () => {
@@ -236,7 +292,7 @@ const AdminProduct = () => {
                         fontSize: "20px",
                         cursor: "pointer",
                     }}
-                    onClick={handleDeteleProduct}
+                    onClick={() => setIsModalDelete(true)}
                 />
                 <EditOutlined
                     style={{
@@ -250,19 +306,179 @@ const AdminProduct = () => {
         );
     };
 
+    const handleSearch = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        setSearchedColumn(dataIndex);
+    };
+    const handleReset = (clearFilters) => {
+        clearFilters();
+        setSearchText("");
+    };
+
+    const getColumnSearchProps = (dataIndex) => ({
+        filterDropdown: ({
+            setSelectedKeys,
+            selectedKeys,
+            confirm,
+            clearFilters,
+            close,
+        }) => (
+            <div
+                style={{
+                    padding: 8,
+                }}
+                onKeyDown={(e) => e.stopPropagation()}
+            >
+                <InputComponent
+                    ref={searchInput}
+                    placeholder={`Search ${dataIndex}`}
+                    value={selectedKeys[0]}
+                    onChange={(e) =>
+                        setSelectedKeys(e.target.value ? [e.target.value] : [])
+                    }
+                    onPressEnter={() =>
+                        handleSearch(selectedKeys, confirm, dataIndex)
+                    }
+                    style={{
+                        marginBottom: 8,
+                        display: "block",
+                    }}
+                />
+                <Space>
+                    <Button
+                        type="primary"
+                        onClick={() =>
+                            handleSearch(selectedKeys, confirm, dataIndex)
+                        }
+                        icon={<SearchOutlined />}
+                        size="small"
+                        style={{
+                            width: 90,
+                        }}
+                    >
+                        Search
+                    </Button>
+                    <Button
+                        onClick={() =>
+                            clearFilters && handleReset(clearFilters)
+                        }
+                        size="small"
+                        style={{
+                            width: 90,
+                        }}
+                    >
+                        Reset
+                    </Button>
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={() => {
+                            confirm({
+                                closeDropdown: false,
+                            });
+                            setSearchText(selectedKeys[0]);
+                            setSearchedColumn(dataIndex);
+                        }}
+                    >
+                        Filter
+                    </Button>
+                    <Button
+                        type="link"
+                        size="small"
+                        onClick={() => {
+                            close();
+                        }}
+                    >
+                        close
+                    </Button>
+                </Space>
+            </div>
+        ),
+        filterIcon: (filtered) => (
+            <SearchOutlined
+                style={{
+                    color: filtered ? "#1677ff" : undefined,
+                }}
+            />
+        ),
+        onFilter: (value, record) =>
+            record[dataIndex]
+                .toString()
+                .toLowerCase()
+                .includes(value.toLowerCase()),
+        onFilterDropdownOpenChange: (visible) => {
+            if (visible) {
+                setTimeout(() => searchInput.current?.select(), 100);
+            }
+        },
+        // render: (text) =>
+        //     searchedColumn === dataIndex ? (
+        //         <Highlighter
+        //             highlightStyle={{
+        //                 backgroundColor: "#ffc069",
+        //                 padding: 0,
+        //             }}
+        //             searchWords={[searchText]}
+        //             autoEscape
+        //             textToHighlight={text ? text.toString() : ""}
+        //         />
+        //     ) : (
+        //         text
+        //     ),
+    });
+
     const columns = [
         {
             title: "Name",
             dataIndex: "name",
-            render: (text) => <a>{text}</a>,
+            // render: (text) => <a>{text}</a>,
+            sorter: (a, b) => a.name.length - b.name.length,
+            ...getColumnSearchProps("name"),
         },
         {
             title: "Price",
             dataIndex: "price",
+            sorter: (a, b) => a.price - b.price,
+            filters: [
+                {
+                    text: ">= 10.000.000",
+                    value: ">=",
+                },
+                {
+                    text: "<=  10.000.000",
+                    value: "<=",
+                },
+            ],
+            onFilter: (value, record) => {
+                if (value === ">=") {
+                    return record.price >= 10000000;
+                }
+                return record.price <= 10000000;
+            },
+            width: "20%",
         },
         {
             title: "Rating",
             dataIndex: "rating",
+            sorter: (a, b) => a.rating - b.rating,
+            filters: [
+                {
+                    text: ">= 5",
+                    value: ">=",
+                },
+                {
+                    text: "<= 5",
+                    value: "<=",
+                },
+            ],
+            onFilter: (value, record) => {
+                if (value === ">=") {
+                    return record.rating >= 5;
+                }
+                return record.rating <= 5;
+            },
+            width: "20%",
         },
         {
             title: "Type",
@@ -282,12 +498,18 @@ const AdminProduct = () => {
         });
 
     const onUpdateProduct = (values) => {
-        console.log("Updating product with values: ", values);
-        mutationUpdate.mutate({
-            id: rowSelected,
-            token: user?.access_token,
-            stateProductDetails: values,
-        });
+        mutationUpdate.mutate(
+            {
+                id: rowSelected,
+                token: user?.access_token,
+                ...values,
+            },
+            {
+                onSettled: () => {
+                    queryProduct.refetch();
+                },
+            }
+        );
     };
     return (
         <div>
@@ -319,13 +541,14 @@ const AdminProduct = () => {
                         }}
                     />
                 </div>
-                <Modal
+                <ModalComponent
                     title="Tạo sản phẩm"
                     open={isModalOpen}
                     onCancel={handleCancel}
                     footer={null}
                 >
                     <Form
+                        form={form} //không nhớ các trường vừa nhập
                         name="createProduct"
                         labelCol={{
                             span: 10,
@@ -338,7 +561,7 @@ const AdminProduct = () => {
                         }}
                         onFinish={onFinish}
                         autoComplete="on"
-                        form={form} //không nhớ các trường vừa nhập
+
                         // initialValues={{
                         //     remember: true,
                         // }}
@@ -491,7 +714,7 @@ const AdminProduct = () => {
                             </Button>
                         </Form.Item>
                     </Form>
-                </Modal>
+                </ModalComponent>
                 <DrawerComponent
                     title="Chi tiết sản phẩm"
                     isOpen={isOpenDrawer}
@@ -500,6 +723,7 @@ const AdminProduct = () => {
                 >
                     <Loading isLoading={isLoadingUpdate}>
                         <Form
+                            form={form} //không nhớ các trường vừa nhập
                             name="productDetails"
                             labelCol={{
                                 span: 10,
@@ -512,7 +736,6 @@ const AdminProduct = () => {
                             }}
                             onFinish={onUpdateProduct}
                             autoComplete="on"
-                            form={form} //không nhớ các trường vừa nhập
                         >
                             <Form.Item
                                 label="Name"
@@ -664,6 +887,15 @@ const AdminProduct = () => {
                         </Form>
                     </Loading>
                 </DrawerComponent>
+
+                <ModalComponent
+                    title="Xóa sản phẩm"
+                    open={isModalDelete}
+                    onOk={handleDeleteProduct}
+                    onCancel={handleCancelDelete}
+                >
+                    <div>Bạn có muốn xóa sản phẩm không!</div>
+                </ModalComponent>
             </div>
         </div>
     );
