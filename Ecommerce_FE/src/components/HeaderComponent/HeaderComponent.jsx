@@ -80,7 +80,12 @@ const HeaderComponent = ({ isHidenSearch = false, isHidenCart = false }) => {
                 }}
             >
                 <Col span={5}>
-                    <WrapperTextHeader>SHOP</WrapperTextHeader>
+                    <WrapperTextHeader
+                        onClick={() => navigate("/")}
+                        style={{ cursor: "pointer" }}
+                    >
+                        SHOP
+                    </WrapperTextHeader>
                 </Col>
                 {!isHidenSearch && (
                     <Col span={13}>

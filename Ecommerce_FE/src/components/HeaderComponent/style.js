@@ -6,7 +6,7 @@ export const WrapperHeader = styled(Row)`
     // background-color: #00a0ff;
     // align-items: center;
     padding: 10px 120px;
-    background-color: #00a0ff;
+    background-color: #51a7bf;
     align-items: center;
     position: fixed; // Đặt header ở vị trí cố định
     top: 0; // Đặt nó ở trên cùng của trang

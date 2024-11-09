@@ -31,7 +31,7 @@ const AdminPage = () => {
                 return <></>;
         }
     };
-    const handleOnClick = ({ item, key, keyPath, domEvent }) => {
+    const handleOnClick = ({ key }) => {
         setKeySelected(key);
     };
     console.log("keySelected", keySelected);
@@ -39,18 +39,29 @@ const AdminPage = () => {
     return (
         <>
             <HeaderComponent isHidenSearch isHidenCart />
-            <div style={{ display: "flex", marginTop: "60px" }}>
+            <div style={{ display: "flex" }}>
                 <Menu
                     mode="inline"
                     defaultSelectedKeys={["231"]}
                     style={{
                         width: 256,
-                        boxShadow: "1px -1px 2px #ccc",
+                        boxShadow: "3px -1px 2px #ccc",
+                        position: "fixed",
+                        top: "50px",
+                        height: "100%",
+                        overflowY: "auto",
                     }}
                     items={items}
                     onClick={handleOnClick}
                 />
-                <div style={{ flex: 1, padding: "15px" }}>
+                <div
+                    style={{
+                        flex: 1,
+                        padding: "15px",
+                        marginLeft: "256px",
+                        marginTop: "60px",
+                    }}
+                >
                     {renderPage(keySelected)}
                 </div>
             </div>

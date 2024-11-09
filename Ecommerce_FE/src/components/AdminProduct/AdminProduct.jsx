@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Button, Form, Space } from "antd";
 import {
     DeleteOutlined,
@@ -16,10 +16,10 @@ import { useMutationHooks } from "../../hooks/useMutationHook";
 import * as message from "../../components/Message/Message";
 import TextArea from "antd/es/input/TextArea";
 import { useQuery } from "@tanstack/react-query";
-import DrawerComponent from "../DrawerComponent/DrawerComponent";
-import Loading from "../LoadingComponent/Loading";
 import { useSelector } from "react-redux";
 import ModalComponent from "../ModalComponent/ModalComponent";
+import DrawerComponent from "../DrawerComponent/DrawerComponent";
+import Loading from "../LoadingComponent/Loading";
 
 const AdminProduct = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,7 +28,7 @@ const AdminProduct = () => {
     const user = useSelector((state) => state?.user);
     const [isModalDelete, setIsModalDelete] = useState(false);
     const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
-
+    const [form] = Form.useForm();
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
     const searchInput = useRef(null);
@@ -69,9 +69,8 @@ const AdminProduct = () => {
         return res;
     });
 
-    //update  product
+    // update product
     const mutationUpdate = useMutationHooks((data) => {
-        console.log("data Updat:", data);
         const { id, token, ...rests } = data;
         const res = ProductService.updateProduct(id, token, { ...rests });
         return res;
@@ -84,20 +83,56 @@ const AdminProduct = () => {
         return res;
     });
 
+    //delete all product
+    const mutationDeleteMany = useMutationHooks((data) => {
+        const { token, ids } = data;
+        const res = ProductService.deleteManyProduct({ ids }, token);
+        return res;
+    });
+    console.log("mutationDeleteMany", mutationDeleteMany);
+
     const getAllProducts = async () => {
         const res = await ProductService.getAllProduct();
         // console.log("res: ", res);
         return res;
     };
 
-    const [form] = Form.useForm();
+    //create product
+    const handleCancel = useCallback(() => {
+        setIsModalOpen(false);
+        setStateProduct({
+            name: "",
+            type: "",
+            countInStock: "",
+            price: "",
+            rating: "",
+            description: "",
+            image: "",
+        });
+        form.resetFields();
+    }, [form]);
 
+    //update product
+    const handleCloseDrawer = useCallback(() => {
+        setIsOpenDrawer(false);
+        setStateProductDetails({
+            name: "",
+            type: "",
+            countInStock: "",
+            price: "",
+            rating: "",
+            description: "",
+            image: "",
+        });
+        form.resetFields();
+    }, [form]);
+
+    //create product
     const { data, isSuccess, isError } = mutationCreate;
 
     //update product
     const {
         data: dataUpdated,
-        isLoading: isLoadingUpdated,
         isSuccess: isSuccessUpdated,
         isError: isErrorUpdated,
     } = mutationUpdate;
@@ -110,6 +145,15 @@ const AdminProduct = () => {
         isError: isErrorDeleted,
     } = mutationDelete;
     // console.log("data", data);
+
+    //delete many product
+    const {
+        data: dataDeletedMany,
+        isLoading: isLoadingDeletedMany,
+        isSuccess: isSuccessDeletedMany,
+        isError: isErrorDeletedMany,
+    } = mutationDeleteMany;
+
     const queryProduct = useQuery({
         queryKey: ["products"],
         queryFn: getAllProducts,
@@ -123,11 +167,26 @@ const AdminProduct = () => {
         if (isSuccess && data?.status === "OK") {
             message.success("Tạo sản phẩm thành công!");
             handleCancel();
-            mutationCreate.reset();
+            // mutationCreate.reset();
         } else if (isError) {
             message.error("Tạo sản phẩm thất bại!");
         }
-    }, [isSuccess]);
+    }, [isSuccess, isError, data?.status, handleCancel]);
+
+    //update product
+    useEffect(() => {
+        if (isSuccessUpdated && dataUpdated?.status === "OK") {
+            message.success("Cập nhật sản phẩm thành công!");
+            handleCloseDrawer();
+        } else if (isErrorUpdated) {
+            message.error("Cập nhật sản phẩm thất bại!");
+        }
+    }, [
+        isSuccessUpdated,
+        isErrorUpdated,
+        dataUpdated?.status,
+        handleCloseDrawer,
+    ]);
 
     //delete product
     useEffect(() => {
@@ -137,54 +196,42 @@ const AdminProduct = () => {
         } else if (isErrorDeleted) {
             message.error("Xóa sản phẩm thất bại!");
         }
-    }, [isSuccessDeleted]);
+    }, [isSuccessDeleted, isErrorDeleted, dataDeleted?.status]);
 
-    //update product
+    //delete many product
     useEffect(() => {
-        if (isSuccessUpdated && dataUpdated?.status === "OK") {
-            message.success("Cập nhật thành công!");
-            handleCloseDrawer();
-            mutationUpdate.reset();
-        } else if (isErrorUpdated) {
-            message.error("Cập nhật thất bại!");
+        if (isSuccessDeletedMany && dataDeletedMany?.status === "OK") {
+            message.success("Xóa sản phẩm thành công!");
+            handleDeleteManyProduct();
+        } else if (isErrorDeletedMany) {
+            message.error("Xóa sản phẩm thất bại!");
         }
-    }, [isSuccessUpdated, isErrorUpdated]);
-
-    const handleCancel = () => {
-        setIsModalOpen(false);
-        setStateProduct({
-            name: "",
-            type: "",
-            countInStock: "",
-            price: "",
-            rating: "",
-            description: "",
-            image: "",
-        });
-        form.resetFields();
-    };
-    //update product
-    const handleCloseDrawer = () => {
-        setIsOpenDrawer(false);
-        setStateProductDetails({
-            name: "",
-            type: "",
-            countInStock: "",
-            price: "",
-            rating: "",
-            description: "",
-            image: "",
-        });
-        form.resetFields();
-    };
+    }, [isSuccessDeletedMany, isErrorDeletedMany, dataDeletedMany?.status]);
 
     //create product
-    const onFinish = () => {
+    const onCreateProduct = () => {
         mutationCreate.mutate(stateProduct, {
             onSettled: () => {
                 queryProduct.refetch();
             },
         });
+    };
+
+    //update product
+    const onUpdateProduct = (values) => {
+        console.log("Updated Product Values:", values);
+        mutationUpdate.mutate(
+            {
+                id: rowSelected,
+                token: user?.access_token,
+                ...values,
+            },
+            {
+                onSettled: () => {
+                    queryProduct.refetch();
+                },
+            }
+        );
     };
 
     const handleOnChange = (e) => {
@@ -193,6 +240,15 @@ const AdminProduct = () => {
             [e.target.name]: e.target.value,
         });
         console.log("e.target", e.target.name, e.target.value);
+    };
+
+    //get details of product
+    const handleOnChangeDetails = (e) => {
+        setStateProductDetails({
+            ...stateProductDetails,
+            [e.target.name]: e.target.value,
+        });
+        // console.log("e.target", e.target.name, e.target.value);
     };
 
     const handleOnChangeImage = async ({ fileList }) => {
@@ -206,16 +262,20 @@ const AdminProduct = () => {
         });
     };
 
-    //get details of product
-    const handleOnChangeDetails = (e) => {
+    //get image product details
+    const handleOnChangeImageDetails = async ({ fileList }) => {
+        const file = fileList[0];
+        if (!file.url && !file.preview) {
+            file.preview = await getBase64(file.originFileObj);
+        }
         setStateProductDetails({
             ...stateProductDetails,
-            [e.target.name]: e.target.value,
+            image: file.preview,
         });
-        // console.log("e.target", e.target.name, e.target.value);
     };
 
     console.log("state - product:", stateProductDetails);
+
     //details of product
     useEffect(() => {
         // if (stateProductDetails) {
@@ -230,22 +290,6 @@ const AdminProduct = () => {
             fetchGetDetailsProduct(rowSelected);
         }
     }, [rowSelected]);
-
-    const handleDetailsProduct = () => {
-        setIsOpenDrawer(true);
-    };
-
-    //get image product details
-    const handleOnChangeImageDetails = async ({ fileList }) => {
-        const file = fileList[0];
-        if (!file.url && !file.preview) {
-            file.preview = await getBase64(file.originFileObj);
-        }
-        setStateProductDetails({
-            ...stateProductDetails,
-            image: file.preview,
-        });
-    };
 
     //details of product
     const fetchGetDetailsProduct = async (rowSelected) => {
@@ -283,6 +327,23 @@ const AdminProduct = () => {
         );
     };
 
+    //delete many product
+    const handleDeleteManyProduct = (ids) => {
+        mutationDeleteMany.mutate(
+            { ids: ids, token: user?.access_token },
+            {
+                onSettled: () => {
+                    queryProduct.refetch();
+                },
+            }
+        );
+    };
+
+    const handleDetailsProduct = () => {
+        console.log("rowSelected", rowSelected);
+        setIsOpenDrawer(true);
+    };
+
     const renderAction = () => {
         return (
             <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
@@ -308,12 +369,12 @@ const AdminProduct = () => {
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
-        setSearchText(selectedKeys[0]);
-        setSearchedColumn(dataIndex);
+        // setSearchText(selectedKeys[0]);
+        // setSearchedColumn(dataIndex);
     };
     const handleReset = (clearFilters) => {
         clearFilters();
-        setSearchText("");
+        // setSearchText("");
     };
 
     const getColumnSearchProps = (dataIndex) => ({
@@ -496,21 +557,8 @@ const AdminProduct = () => {
         products?.data?.map((p) => {
             return { ...p, key: p._id };
         });
+    console.log("dataTable", dataTable);
 
-    const onUpdateProduct = (values) => {
-        mutationUpdate.mutate(
-            {
-                id: rowSelected,
-                token: user?.access_token,
-                ...values,
-            },
-            {
-                onSettled: () => {
-                    queryProduct.refetch();
-                },
-            }
-        );
-    };
     return (
         <div>
             <WrapperHeader>Quản lý sản phẩm</WrapperHeader>
@@ -529,6 +577,7 @@ const AdminProduct = () => {
                 </Button>
                 <div>
                     <TableComponent
+                        handleDeleteManyProduct={handleDeleteManyProduct}
                         columns={columns}
                         isLoading={isLoadingProducts}
                         data={dataTable}
@@ -542,13 +591,14 @@ const AdminProduct = () => {
                     />
                 </div>
                 <ModalComponent
+                    forceRender
                     title="Tạo sản phẩm"
                     open={isModalOpen}
                     onCancel={handleCancel}
                     footer={null}
                 >
                     <Form
-                        form={form} //không nhớ các trường vừa nhập
+                        form={form}
                         name="createProduct"
                         labelCol={{
                             span: 10,
@@ -559,18 +609,12 @@ const AdminProduct = () => {
                         style={{
                             maxWidth: 600,
                         }}
-                        onFinish={onFinish}
+                        onFinish={onCreateProduct}
                         autoComplete="on"
-
-                        // initialValues={{
-                        //     remember: true,
-                        // }}
-
-                        // onFinishFailed={onFinishFailed}
                     >
                         <Form.Item
                             label="Name"
-                            name="Name"
+                            name="name"
                             rules={[
                                 {
                                     required: true,
@@ -587,7 +631,7 @@ const AdminProduct = () => {
 
                         <Form.Item
                             label="Type"
-                            name="Type"
+                            name="type"
                             rules={[
                                 {
                                     required: true,
@@ -604,7 +648,7 @@ const AdminProduct = () => {
 
                         <Form.Item
                             label="Count In Stock"
-                            name="CountInStock"
+                            name="countInStock"
                             rules={[
                                 {
                                     required: true,
@@ -622,7 +666,7 @@ const AdminProduct = () => {
 
                         <Form.Item
                             label="Price"
-                            name="Price"
+                            name="price"
                             rules={[
                                 {
                                     required: true,
@@ -639,7 +683,7 @@ const AdminProduct = () => {
 
                         <Form.Item
                             label="Rating"
-                            name="Rating"
+                            name="rating"
                             rules={[
                                 {
                                     required: true,
@@ -656,13 +700,13 @@ const AdminProduct = () => {
 
                         <Form.Item
                             label="Description"
-                            name="Description"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please input your description!",
-                                },
-                            ]}
+                            name="description"
+                            // rules={[
+                            //     {
+                            //         required: true,
+                            //         message: "Please input your description!",
+                            //     },
+                            // ]}
                         >
                             <TextArea
                                 rows={4}
@@ -697,7 +741,7 @@ const AdminProduct = () => {
                                             objectFit: "cover",
                                             marginLeft: "10px",
                                         }}
-                                        alt="image"
+                                        alt="imagePro"
                                     />
                                 )}
                             </WrapperUploadFile>
@@ -715,16 +759,17 @@ const AdminProduct = () => {
                         </Form.Item>
                     </Form>
                 </ModalComponent>
+
                 <DrawerComponent
-                    title="Chi tiết sản phẩm"
+                    title="Cập nhật sản phẩm"
                     isOpen={isOpenDrawer}
                     onClose={() => setIsOpenDrawer(false)}
                     width="60%"
                 >
                     <Loading isLoading={isLoadingUpdate}>
                         <Form
-                            form={form} //không nhớ các trường vừa nhập
-                            name="productDetails"
+                            form={form}
+                            layout="productDetails"
                             labelCol={{
                                 span: 10,
                             }}
@@ -743,7 +788,7 @@ const AdminProduct = () => {
                                 rules={[
                                     {
                                         required: true,
-                                        message: "Please input your name!",
+                                        message: "Please input name!",
                                     },
                                 ]}
                             >
@@ -751,7 +796,6 @@ const AdminProduct = () => {
                                     value={stateProductDetails.name}
                                     onChange={handleOnChangeDetails}
                                     name="name"
-                                    // disabled
                                 />
                             </Form.Item>
 
@@ -761,7 +805,7 @@ const AdminProduct = () => {
                                 rules={[
                                     {
                                         required: true,
-                                        message: "Please input your type!",
+                                        message: "Please input type!",
                                     },
                                 ]}
                             >
@@ -778,8 +822,7 @@ const AdminProduct = () => {
                                 rules={[
                                     {
                                         required: true,
-                                        message:
-                                            "Please input your count in stock!",
+                                        message: "Please input count in stock!",
                                     },
                                 ]}
                             >
@@ -796,7 +839,7 @@ const AdminProduct = () => {
                                 rules={[
                                     {
                                         required: true,
-                                        message: "Please input your price!",
+                                        message: "Please input price!",
                                     },
                                 ]}
                             >
@@ -813,7 +856,7 @@ const AdminProduct = () => {
                                 rules={[
                                     {
                                         required: true,
-                                        message: "Please input your rating!",
+                                        message: "Please input rating!",
                                     },
                                 ]}
                             >
@@ -824,17 +867,7 @@ const AdminProduct = () => {
                                 />
                             </Form.Item>
 
-                            <Form.Item
-                                label="Description"
-                                name="description"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message:
-                                            "Please input your description!",
-                                    },
-                                ]}
-                            >
+                            <Form.Item label="Description" name="description">
                                 <TextArea
                                     rows={4}
                                     value={stateProductDetails.description}
@@ -868,18 +901,13 @@ const AdminProduct = () => {
                                                 objectFit: "cover",
                                                 marginLeft: "10px",
                                             }}
-                                            alt="image product"
+                                            alt="image-product"
                                         />
                                     )}
                                 </WrapperUploadFile>
                             </Form.Item>
 
-                            <Form.Item
-                                wrapperCol={{
-                                    offset: 8,
-                                    span: 16,
-                                }}
-                            >
+                            <Form.Item>
                                 <Button type="primary" htmlType="submit">
                                     Apply
                                 </Button>
