@@ -113,6 +113,27 @@ const deleteUser = async (req, res) => {
     }
 };
 
+const deleteMany = async (req, res) => {
+    try {
+        const ids = req.body;
+
+        if (!ids) {
+            return res.status(200).json({
+                status: "ERR",
+                message: "The ids user is required",
+            });
+        }
+        const user = await UserService.deleteManyUser(ids);
+
+        return res.status(200).json(user);
+    } catch (e) {
+        return res.status(404).json({
+            message: "! User creation failed !",
+            error: e.message,
+        });
+    }
+};
+
 const getAllUsers = async (req, res) => {
     try {
         const user = await UserService.getAllUsers();
@@ -146,7 +167,7 @@ const getDetailsUser = async (req, res) => {
 };
 
 const refreshToken = async (req, res) => {
-    console.log("req.cookies.refresh_token: ", req.cookies.refresh_token);
+    // console.log("req.cookies.refresh_token: ", req.cookies.refresh_token);
     try {
         const token = req.cookies.refresh_token;
 
@@ -191,4 +212,5 @@ module.exports = {
     getDetailsUser,
     refreshToken,
     logoutUser,
+    deleteMany,
 };

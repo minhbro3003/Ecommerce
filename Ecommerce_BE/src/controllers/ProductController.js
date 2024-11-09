@@ -37,7 +37,7 @@ const updateProduct = async (req, res) => {
         return res.status(200).json(user);
     } catch (e) {
         return res.status(404).json({
-            message: "! User creation failed !",
+            message: "! User updated failed !",
             error: e.message,
         });
     }
@@ -84,12 +84,61 @@ const deleteProduct = async (req, res) => {
     }
 };
 
+// const deleteMany = async (req, res) => {
+//     console.log("reqqqqqq", req.body);
+//     try {
+//         const ids = req.body.ids;
+
+//         if (!ids) {
+//             return res.status(200).json({
+//                 status: "ERR",
+//                 message: "The ids is required",
+//             });
+//         }
+//         const user = await ProductService.deleteManyProduct(ids);
+
+//         return res.status(200).json(user);
+//     } catch (e) {
+//         return res.status(404).json({
+//             message: "! Delete Product failed !",
+//             error: e.message,
+//         });
+//     }
+// };
+
+const deleteMany = async (req, res) => {
+    console.log("Request Body:", req.body); // Log toàn bộ req.body
+    try {
+        const ids = req.body.ids;
+
+        // Kiểm tra nếu ids không tồn tại hoặc không phải là mảng
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(200).json({
+                status: "ERR",
+                message:
+                    "The ids is required and should be an array with at least one element",
+            });
+        }
+
+        console.log("IDs to delete:", ids); // Log mảng ids
+
+        const result = await ProductService.deleteManyProduct(ids);
+
+        return res.status(200).json(result);
+    } catch (e) {
+        return res.status(404).json({
+            message: "! Delete Product failed !",
+            error: e.message,
+        });
+    }
+};
+
 const getAllProduct = async (req, res) => {
     try {
         const { limit, page, sort, filter } = req.query;
-        console.log("req.query", req.query);
+        // console.log("req.query", req.query);
         const product = await ProductService.getAllProduct(
-            Number(limit) || 8,
+            Number(limit) || 10,
             Number(page) || 0,
             sort,
             filter
@@ -108,4 +157,5 @@ module.exports = {
     getDetailsProduct,
     deleteProduct,
     getAllProduct,
+    deleteMany,
 };

@@ -19,5 +19,10 @@ router.delete(
     productController.deleteProduct
 );
 router.get("/get-all-product", productController.getAllProduct);
+router.post(
+    "/delete-many-product",
+    authMiddleware,
+    productController.deleteMany
+);
 
 module.exports = router;

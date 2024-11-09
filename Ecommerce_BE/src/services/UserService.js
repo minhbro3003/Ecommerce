@@ -56,7 +56,7 @@ const loginUser = (userLogin) => {
                 password,
                 checkUser.password
             );
-            console.log("comparePassword: ", comparePassword);
+            // console.log("comparePassword: ", comparePassword);
 
             if (!comparePassword) {
                 resolve({
@@ -78,7 +78,7 @@ const loginUser = (userLogin) => {
                 isAdmin: checkUser.isAdmin,
             });
 
-            console.log("refresh_token: ", refresh_token);
+            // console.log("refresh_token: ", refresh_token);
             resolve({
                 status: "OK",
                 message: "Success",
@@ -108,7 +108,7 @@ const updateUser = (id, data) => {
             });
             resolve({
                 status: "OK",
-                message: "Success",
+                message: "Update User Success",
                 data: updatedUser,
             });
         } catch (e) {
@@ -140,6 +140,20 @@ const deleteUser = (id) => {
     });
 };
 
+const deleteManyUser = (ids) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            await User.deleteMany({ _id: ids });
+            resolve({
+                status: "OK",
+                message: "Delete user successfully",
+            });
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
+
 const getAllUsers = () => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -161,7 +175,7 @@ const getDetailsUser = (id) => {
             const user = await User.findOne({ _id: id }); //_id
             if (user === null) {
                 resolve({
-                    status: "Error",
+                    status: "ERR",
                     message: "The user is not defined",
                 });
             }
@@ -184,4 +198,5 @@ module.exports = {
     deleteUser,
     getAllUsers,
     getDetailsUser,
+    deleteManyUser,
 };

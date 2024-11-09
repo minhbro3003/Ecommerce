@@ -47,7 +47,7 @@ const authUserMiddleware = (req, res, next) => {
                 status: "Error",
             });
         }
-        console.log("user", user);
+        // console.log("user", user);
         if (user?.isAdmin || user?.id === userId) {
             next();
         } else {
@@ -56,7 +56,7 @@ const authUserMiddleware = (req, res, next) => {
                 status: "Error",
             });
         }
-        console.log("user", user);
+        // console.log("user", user);
     });
 };
 
