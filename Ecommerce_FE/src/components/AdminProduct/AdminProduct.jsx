@@ -285,11 +285,11 @@ const AdminProduct = () => {
 
     //details of product
     useEffect(() => {
-        if (rowSelected) {
+        if (rowSelected && isOpenDrawer) {
             setIsLoadingUpdate(true);
             fetchGetDetailsProduct(rowSelected);
         }
-    }, [rowSelected]);
+    }, [rowSelected, isOpenDrawer]);
 
     //details of product
     const fetchGetDetailsProduct = async (rowSelected) => {
@@ -577,7 +577,7 @@ const AdminProduct = () => {
                 </Button>
                 <div>
                     <TableComponent
-                        handleDeleteManyProduct={handleDeleteManyProduct}
+                        handleDeleteMany={handleDeleteManyProduct}
                         columns={columns}
                         isLoading={isLoadingProducts}
                         data={dataTable}

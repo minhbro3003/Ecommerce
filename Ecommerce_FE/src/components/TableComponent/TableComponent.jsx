@@ -13,7 +13,7 @@ const TableComponent = (props) => {
             showSizeChanger: true,
             pageSizeOptions: ["5", "10", "20", "50"],
         },
-        handleDeleteManyProduct,
+        handleDeleteMany,
     } = props;
     const [rowSelectedKeys, setRowSelecteKeys] = useState([]);
 
@@ -24,7 +24,7 @@ const TableComponent = (props) => {
     };
 
     const handleDeleteAll = () => {
-        handleDeleteManyProduct(rowSelectedKeys);
+        handleDeleteMany(rowSelectedKeys);
     };
 
     return (

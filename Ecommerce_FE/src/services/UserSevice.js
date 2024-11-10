@@ -103,7 +103,7 @@ export const getAllUser = async (access_token) => {
 };
 
 export const deleteManyUser = async (iddata, access_token) => {
-    const res = await axiosJWT.delete(
+    const res = await axiosJWT.post(
         `${process.env.REACT_APP_API_URL_BACKEND}/user/delete-many-user`,
         iddata,
         {

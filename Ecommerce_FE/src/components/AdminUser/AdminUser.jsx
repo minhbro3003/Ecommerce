@@ -35,7 +35,7 @@ const AdminUser = () => {
         phone: "",
     });
 
-    //update  product
+    //update  user
     const mutationUpdate = useMutationHooks((data) => {
         console.log("data Updat:", data);
         const { id, token, ...rests } = data;
@@ -43,12 +43,20 @@ const AdminUser = () => {
         return res;
     });
 
-    //delete product
+    //delete user
     const mutationDelete = useMutationHooks((data) => {
         const { id, token } = data;
         const res = UserSevice.deleteUser(id, token);
         return res;
     });
+
+    //delete all user
+    const mutationDeleteMany = useMutationHooks((data) => {
+        const { token, ids } = data;
+        const res = UserSevice.deleteManyUser({ ids }, token);
+        return res;
+    });
+    console.log("mutationDeleteMany", mutationDeleteMany);
 
     const getAllUsers = async () => {
         const res = await UserSevice.getAllUser();
@@ -83,6 +91,15 @@ const AdminUser = () => {
         isError: isErrorDeleted,
     } = mutationDelete;
     // console.log("data", data);
+
+    //delete many user
+    const {
+        data: dataDeletedMany,
+        isLoading: isLoadingDeletedMany,
+        isSuccess: isSuccessDeletedMany,
+        isError: isErrorDeletedMany,
+    } = mutationDeleteMany;
+
     const queryUser = useQuery({
         queryKey: ["users"],
         queryFn: getAllUsers,
@@ -115,6 +132,16 @@ const AdminUser = () => {
         handleCloseDrawer,
     ]);
 
+    //delete many user
+    useEffect(() => {
+        if (isSuccessDeletedMany && dataDeletedMany?.status === "OK") {
+            message.success("Xóa user thành công!");
+            handleDeleteManyUser();
+        } else if (isErrorDeletedMany) {
+            message.error("Xóa user thất bại!");
+        }
+    }, [isSuccessDeletedMany, isErrorDeletedMany, dataDeletedMany?.status]);
+
     //update product
     // const handleCloseDrawer = () => {
     //     setIsOpenDrawer(false);
@@ -146,11 +173,11 @@ const AdminUser = () => {
 
     //details of product
     useEffect(() => {
-        if (rowSelected) {
+        if (rowSelected && isOpenDrawer) {
             setIsLoadingUpdate(true);
             fetchGetDetailsUser(rowSelected);
         }
-    }, [rowSelected]);
+    }, [rowSelected, isOpenDrawer]);
 
     const handleDetailsUser = () => {
         setIsOpenDrawer(true);
@@ -181,6 +208,18 @@ const AdminUser = () => {
     const handleDeleteUser = () => {
         mutationDelete.mutate(
             { id: rowSelected, token: user?.access_token },
+            {
+                onSettled: () => {
+                    queryUser.refetch();
+                },
+            }
+        );
+    };
+
+    //delete many product
+    const handleDeleteManyUser = (ids) => {
+        mutationDeleteMany.mutate(
+            { ids: ids, token: user?.access_token },
             {
                 onSettled: () => {
                     queryUser.refetch();
@@ -412,6 +451,7 @@ const AdminUser = () => {
             <div style={{ margin: "15px 0" }}>
                 <div>
                     <TableComponent
+                        handleDeleteMany={handleDeleteManyUser}
                         columns={columns}
                         isLoading={isLoadingUsers}
                         data={dataTable}
