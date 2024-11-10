@@ -114,15 +114,18 @@ const deleteUser = async (req, res) => {
 };
 
 const deleteMany = async (req, res) => {
+    console.log("Request Body:", req.body); // Log toàn bộ req.body
     try {
-        const ids = req.body;
+        const ids = req.body.ids;
 
-        if (!ids) {
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
             return res.status(200).json({
                 status: "ERR",
                 message: "The ids user is required",
             });
         }
+        console.log("IDs to delete:", ids); // Log mảng ids
+
         const user = await UserService.deleteManyUser(ids);
 
         return res.status(200).json(user);
