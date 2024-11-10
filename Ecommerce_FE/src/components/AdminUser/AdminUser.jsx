@@ -16,6 +16,8 @@ import { useMutationHooks } from "../../hooks/useMutationHook";
 import Loading from "../LoadingComponent/Loading";
 import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
+import { WrapperUploadFile } from "../../pages/ProfilePage/style";
+import { getBase64 } from "../../utils";
 
 const AdminUser = () => {
     const [rowSelected, setRowSelected] = useState("");
@@ -33,6 +35,8 @@ const AdminUser = () => {
         email: "",
         isAdmin: false,
         phone: "",
+        avartar: "",
+        address: "",
     });
 
     //update  user
@@ -73,6 +77,8 @@ const AdminUser = () => {
             email: "",
             isAdmin: false,
             phone: "",
+            avartar: "",
+            address: "",
         });
         form.resetFields();
     }, [form]);
@@ -193,9 +199,22 @@ const AdminUser = () => {
                 email: res?.data?.email,
                 phone: res?.data?.phone,
                 isAdmin: res?.data?.isAdmin,
+                address: res?.data?.address,
+                avartar: res?.data?.avartar,
             });
         }
         setIsLoadingUpdate(false);
+    };
+
+    const handleOnChangeImageAvartar = async ({ fileList }) => {
+        const file = fileList[0];
+        if (!file.url && !file.preview) {
+            file.preview = await getBase64(file.originFileObj);
+        }
+        setStateUserDetails({
+            ...stateUserDetails,
+            avartar: file.preview,
+        });
     };
 
     //delete product
@@ -417,6 +436,11 @@ const AdminUser = () => {
             ...getColumnSearchProps("phone"),
         },
         {
+            title: "Address",
+            dataIndex: "address",
+            // ...getColumnSearchProps("address"),
+        },
+        {
             title: "Action",
             dataIndex: "action",
             render: renderAction,
@@ -538,22 +562,44 @@ const AdminUser = () => {
                                 />
                             </Form.Item>
 
-                            {/* <Form.Item
-                                label="IsAdmin"
-                                name="isAdmin"
+                            <Form.Item
+                                label="Address"
+                                name="address"
                                 rules={[
                                     {
                                         required: true,
-                                        message: "Please input your price!",
+                                        message: "Please input your address!",
                                     },
                                 ]}
                             >
                                 <InputComponent
-                                    value={stateUserDetails.isAdmin}
+                                    value={stateUserDetails.address}
                                     onChange={handleOnChangeDetails}
-                                    name="isAdmin"
+                                    name="address"
                                 />
-                            </Form.Item> */}
+                            </Form.Item>
+
+                            <Form.Item label="Avartar" name="avartar">
+                                <WrapperUploadFile
+                                    onChange={handleOnChangeImageAvartar}
+                                    maxCount={1}
+                                >
+                                    <Button>Select File</Button>
+                                    {stateUserDetails?.avartar && (
+                                        <img
+                                            src={stateUserDetails?.avartar}
+                                            style={{
+                                                height: "64px",
+                                                width: "64px",
+                                                borderRadius: "15%",
+                                                objectFit: "cover",
+                                                marginLeft: "10px",
+                                            }}
+                                            alt="image-avartar"
+                                        />
+                                    )}
+                                </WrapperUploadFile>
+                            </Form.Item>
 
                             <Form.Item
                                 wrapperCol={{
