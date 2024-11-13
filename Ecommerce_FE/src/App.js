@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { routes } from "./routes";
 import DefaultComponent from "./components/DefaultComponent/DefaultComponent";
-import axios from "axios";
+// import axios from "axios";
 import { isJsonString } from "./utils";
 import { jwtDecode } from "jwt-decode";
 import * as UserService from "./services/UserSevice";
@@ -36,26 +36,61 @@ export default function App() {
         return { decoded, storageData };
     };
 
+    // UserService.axiosJWT.interceptors.request.use(
+    //     async (config) => {
+    //         const currentTime = new Date().getTime() / 1000;
+    //         const { decoded } = handleDecoded();
+    //         if (decoded?.exp < currentTime) {
+    //             const data = await UserService.refreshToken();
+    //             config.headers["token"] = `Bearer ${data?.access_token}`;
+    //         }
+    //         return config;
+    //     },
+    //     (err) => {
+    //         return Promise.reject(err);
+    //     }
+    // );
+
     UserService.axiosJWT.interceptors.request.use(
         async (config) => {
             const currentTime = new Date().getTime() / 1000;
             const { decoded } = handleDecoded();
             if (decoded?.exp < currentTime) {
-                const data = await UserService.refreshToken();
-                config.headers["token"] = `Bearer ${data?.access_token}`;
+                try {
+                    const data = await UserService.refreshToken();
+                    config.headers[
+                        "Authorization"
+                    ] = `Bearer ${data?.access_token}`;
+                } catch (error) {
+                    console.error("Token refresh error:", error);
+                }
             }
             return config;
         },
         (err) => {
+            console.error("Interceptor request error:", err);
             return Promise.reject(err);
         }
     );
 
-    const handleGetDetailsUser = async (id, token) => {
-        const res = await UserService.getDetailsUser(id, token);
-        dispatch(updateUser({ ...res?.data, access_token: token }));
+    // const handleGetDetailsUser = async (id, token) => {
+    //     const res = await UserService.getDetailsUser(id, token);
+    //     dispatch(updateUser({ ...res?.data, access_token: token }));
 
-        // console.log("res", res);
+    //     // console.log("res", res);
+    // };
+
+    const handleGetDetailsUser = async (id, token) => {
+        try {
+            const res = await UserService.getDetailsUser(id, token);
+            if (res?.data) {
+                dispatch(updateUser({ ...res.data, access_token: token }));
+            }
+        } catch (error) {
+            console.error("Error fetching user details:", error);
+        } finally {
+            setIsLoading(false); // Stop loading once finished
+        }
     };
 
     return (

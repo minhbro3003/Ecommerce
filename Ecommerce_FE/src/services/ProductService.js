@@ -1,10 +1,19 @@
 import axios from "axios";
 import { axiosJWT } from "./UserSevice";
 
-export const getAllProduct = async () => {
-    const res = await axios.get(
-        `${process.env.REACT_APP_API_URL_BACKEND}/product/get-all-product`
-    );
+export const getAllProduct = async (search) => {
+    let res = {};
+    // console.log("search:", !!search);
+    if (search) {
+        res = await axios.get(
+            `${process.env.REACT_APP_API_URL_BACKEND}/product/get-all-product?filter=name&filter=${search}`
+        );
+    } else {
+        res = await axios.get(
+            `${process.env.REACT_APP_API_URL_BACKEND}/product/get-all-product`
+        );
+    }
+
     return res.data;
 };
 

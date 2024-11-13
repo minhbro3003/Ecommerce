@@ -18,13 +18,15 @@ import { useDispatch, useSelector } from "react-redux";
 import * as UserService from "../../services/UserSevice";
 import { resetUser } from "../../redux/slides/useSlide";
 import Loading from "../LoadingComponent/Loading";
+import { searchProduct } from "../../redux/slides/productSlide";
 
 const HeaderComponent = ({ isHidenSearch = false, isHidenCart = false }) => {
     const navigate = useNavigate();
-    const dispath = useDispatch();
+    const dispatch = useDispatch();
     const [userName, setUserName] = useState("");
     const [userAvartar, setUserAvartar] = useState("");
     const [loading, setLoading] = useState(false);
+    const [search, setSearch] = useState("");
     const user = useSelector((state) => state.user);
     // console.log("user count: ", user);
 
@@ -36,7 +38,7 @@ const HeaderComponent = ({ isHidenSearch = false, isHidenCart = false }) => {
         setLoading(true);
         navigate("/");
         await UserService.logoutUser();
-        dispath(resetUser());
+        dispatch(resetUser());
         setLoading(false);
     };
 
@@ -62,6 +64,12 @@ const HeaderComponent = ({ isHidenSearch = false, isHidenCart = false }) => {
             </WrapperContentPopup>
         </div>
     );
+
+    const onSearch = (e) => {
+        setSearch(e.target.value);
+        dispatch(searchProduct(e.target.value));
+        // console.log("e", e.target.value);
+    };
 
     // console.log("user: ", user.name.length);
     return (
@@ -94,6 +102,7 @@ const HeaderComponent = ({ isHidenSearch = false, isHidenCart = false }) => {
                             textButton="Tìm kiếm"
                             size="large"
                             loading
+                            onChange={onSearch}
                         />
                     </Col>
                 )}
