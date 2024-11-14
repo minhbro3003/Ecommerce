@@ -8,15 +8,17 @@ export const WrapperStyleImageSmall = styled.div`
 
 export const WrapperStyleNameProduct = styled.h1`
     color: rgb(36, 36, 36);
-    font-size: 24px;
-    font-weight: 300;
+    font-size: 30px;
+    font-weight: 500;
     line-height: 32px;
     word-break: break-word;
+    margin-top: 10px;
 `;
 
 export const WrapperPriceProduct = styled.div`
     background: rgb(250, 250, 250);
     border-radius: 4px;
+    color: rgb(255, 66, 78);
 `;
 
 export const WrapperPriceTextProduct = styled.h1`
@@ -47,7 +49,9 @@ export const WrapperAddressProduct = styled.div`
     padding: 10px;
 `;
 
-export const WrapperQualityProduct = styled.h2``;
+export const WrapperQualityProduct = styled.h2`
+    margin-top: 10px;
+`;
 
 export const WrapperBtQualityProduct = styled.div`
     display: flex;

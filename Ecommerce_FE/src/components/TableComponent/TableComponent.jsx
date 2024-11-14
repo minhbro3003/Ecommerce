@@ -10,11 +10,6 @@ const TableComponent = (props) => {
         data: dataSource = [],
         isLoading = false,
         columns = [],
-        pagination = {
-            pageSize: 10,
-            showSizeChanger: true,
-            pageSizeOptions: ["5", "10", "20", "50"],
-        },
         handleDeleteMany,
     } = props;
     const [rowSelectedKeys, setRowSelecteKeys] = useState([]);
@@ -22,7 +17,7 @@ const TableComponent = (props) => {
         const arr = columns?.filter((col) => col.dataIndex !== "action");
         return arr;
     }, [columns]);
-    console.log("new columns export", newColumnsExport);
+    // console.log("new columns export", newColumnsExport);
 
     const rowSelection = {
         onChange: (selectedRowKeys, selectedRows) => {
@@ -96,7 +91,6 @@ const TableComponent = (props) => {
                 }}
                 columns={columns}
                 dataSource={dataSource}
-                pagination={pagination}
                 {...props}
             />
         </Loading>

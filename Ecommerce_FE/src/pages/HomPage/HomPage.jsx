@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import TypeProduct from "../../components/TypeProduct/TypeProduct";
 import {
     WrapperButtonMore,
@@ -9,6 +9,7 @@ import SliderComponent from "../../components/SliderComponent/SliderComponent";
 import slider1 from "../../assets/images/slide1.webp";
 import slider2 from "../../assets/images/slide2.webp";
 import slider3 from "../../assets/images/slide3.webp";
+import { StarFilled } from "@ant-design/icons";
 import CardComponent from "../../components/CardComponent/CardComponent";
 import { useQuery } from "@tanstack/react-query";
 import * as ProductService from "../../services/ProductService";
@@ -19,44 +20,41 @@ import { useDebounce } from "../../hooks/useDebounce";
 const HomPage = () => {
     const searchProduct = useSelector((state) => state?.product?.search);
     const searchDebounce = useDebounce(searchProduct, 1000);
-    const refSearch = useRef();
-    const [stateProducts, setStateProducts] = useState([]);
+    const [limit, setLimit] = useState(5);
     const [loading, setIsLoading] = useState(false);
 
     const arr = ["TV", "Tu Lanh", "Laptop"];
 
-    const fetchProductAll = async (search) => {
-        const res = await ProductService.getAllProduct(search);
-        if (search?.length > 0 || refSearch.current) {
-            setStateProducts(res?.data);
-        } else {
-            return res;
-        }
+    const fetchProductAll = async (context) => {
+        const search = context?.queryKey && context?.queryKey[2];
+        const limit = context?.queryKey && context?.queryKey[1];
+        console.log("context", context);
+        const res = await ProductService.getAllProduct(search, limit);
+        return res;
     };
 
-    useEffect(() => {
-        if (refSearch.current) {
-            setIsLoading(true);
-            fetchProductAll(searchProduct);
-        }
-        refSearch.current = true;
-        setIsLoading(false);
-    }, [searchDebounce]);
-
-    const { isLoading, data: products } = useQuery({
-        queryKey: ["products"],
+    const {
+        isLoading,
+        data: products,
+        isPreviousData,
+    } = useQuery({
+        queryKey: ["products", limit, searchDebounce],
         queryFn: fetchProductAll,
+
         retry: 3,
         retryDelay: 1000,
     });
-    // console.log("data: ", product);
+    // console.log("isPreviousData: ", products);
 
-    useEffect(() => {
-        // console.log("products?.data?.length: ", products?.data?.length);
-        if (products?.data?.length > 0) {
-            setStateProducts(products?.data);
+    const renderStars = (num) => {
+        const stars = [];
+        for (let i = 0; i < num; i++) {
+            stars.push(
+                <StarFilled key={i} style={{ color: "rgb(255, 196, 0)" }} />
+            );
         }
-    }, [products]);
+        return stars;
+    };
     return (
         <Loading isLoading={isLoading || loading}>
             <div style={{ marginTop: "60px" }}>
@@ -71,13 +69,12 @@ const HomPage = () => {
                     style={{
                         backgroundColor: "#efefef",
                         padding: "0 120px",
-                        height: "1500px",
                         width: "100%",
                     }}
                 >
                     <SliderComponent arrImages={[slider1, slider2, slider3]} />
                     <WrapperProducts>
-                        {stateProducts?.map((p) => {
+                        {products?.data?.map((p) => {
                             return (
                                 <CardComponent
                                     key={p._id}
@@ -86,10 +83,11 @@ const HomPage = () => {
                                     image={p.image}
                                     name={p.name}
                                     price={p.price}
-                                    rating={p.rating}
+                                    rating={renderStars(p?.rating)}
                                     type={p.type}
                                     discount={p.discount}
                                     selled={p.selled}
+                                    id={p._id}
                                 />
                             );
                         })}
@@ -110,7 +108,13 @@ const HomPage = () => {
                                 width: "240px",
                                 height: "38px",
                                 borderRadius: "4px",
-                                marginTop: "15px",
+                                margin: "15px",
+                            }}
+                            disabled={
+                                products?.total === products?.data?.length
+                            }
+                            onClick={() => {
+                                setLimit((prev) => prev + 5);
                             }}
                         />
                     </div>

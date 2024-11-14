@@ -160,17 +160,17 @@ const AdminUser = () => {
     //     form.resetFields();
     // };
 
-    //get details of product
+    //get details of user
     const handleOnChangeDetails = (e) => {
         setStateUserDetails({
             ...stateUserDetails,
             [e.target.name]: e.target.value,
         });
-        // console.log("e.target", e.target.name, e.target.value);
+        console.log("e.target", e.target.name, e.target.value);
     };
 
-    console.log("state - product:", stateUserDetails);
-    //details of product
+    console.log("state - user:", stateUserDetails);
+    //details of user
     useEffect(() => {
         // if (stateUserDetails) {
         form.setFieldsValue(stateUserDetails);
@@ -396,7 +396,6 @@ const AdminUser = () => {
         {
             title: "Name",
             dataIndex: "name",
-            // render: (text) => <a>{text}</a>,
             sorter: (a, b) => a.name.length - b.name.length,
             ...getColumnSearchProps("name"),
             width: "15%",
@@ -404,7 +403,6 @@ const AdminUser = () => {
         {
             title: "Email",
             dataIndex: "email",
-            // render: (text) => <a>{text}</a>,
             sorter: (a, b) => a.email.length - b.email.length,
             ...getColumnSearchProps("email"),
             width: "20%",
