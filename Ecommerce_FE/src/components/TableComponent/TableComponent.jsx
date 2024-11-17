@@ -1,7 +1,7 @@
-import { Table } from "antd";
+import { Button, Table } from "antd";
 import React, { useMemo, useState } from "react";
 import Loading from "../LoadingComponent/Loading";
-// import { Excel } from "antd-table-saveas-excel";
+import { DownloadOutlined } from "@ant-design/icons";
 import * as XLSX from "xlsx";
 
 const TableComponent = (props) => {
@@ -69,21 +69,33 @@ const TableComponent = (props) => {
 
     return (
         <Loading isLoading={isLoading}>
-            {rowSelectedKeys.length > 0 && (
-                <div
-                    style={{
-                        background: "#395F18",
-                        color: "#FEF6C7",
-                        fontWeight: "bold",
-                        padding: "10px",
-                        cursor: "pointer",
-                    }}
-                    onClick={handleDeleteAll}
+            <div>
+                <Button
+                    type="dashed"
+                    style={{ marginBottom: "10px", backgroundColor: "#d9d9d9" }}
+                    shape="round"
+                    icon={<DownloadOutlined />}
+                    onClick={handleExportExcel}
                 >
-                    Xóa tất cả
-                </div>
-            )}
-            <button onClick={handleExportExcel}>Export excel</button>
+                    Export excel
+                </Button>
+
+                {rowSelectedKeys.length > 0 && (
+                    <span
+                        style={{
+                            marginLeft: "10px",
+                        }}
+                        onClick={handleDeleteAll}
+                    >
+                        <Button type="primary" danger>
+                            Xóa tất cả
+                        </Button>
+                    </span>
+                )}
+
+                {/* <button onClick={handleExportExcel}>Export excel</button> */}
+            </div>
+
             <Table
                 rowSelection={{
                     type: selectionType,

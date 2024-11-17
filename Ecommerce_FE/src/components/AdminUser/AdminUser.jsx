@@ -60,7 +60,7 @@ const AdminUser = () => {
         const res = UserSevice.deleteManyUser({ ids }, token);
         return res;
     });
-    console.log("mutationDeleteMany", mutationDeleteMany);
+    // console.log("mutationDeleteMany", mutationDeleteMany);
 
     const getAllUsers = async () => {
         const res = await UserSevice.getAllUser();

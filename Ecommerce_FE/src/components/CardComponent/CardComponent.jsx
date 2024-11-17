@@ -7,7 +7,6 @@ import {
     WrapperReportText,
     WrapperStyleTextSell,
 } from "./style";
-import { StarFilled } from "@ant-design/icons";
 import logo from "../../assets/images/image.png";
 import { useNavigate } from "react-router";
 
@@ -28,7 +27,7 @@ const CardComponent = (props) => {
     const navigate = useNavigate();
     const handleDetailsProduct = (id) => {
         navigate(`/product-details/${id}`);
-        console.log("Product ID:", id);
+        // console.log("Product ID:", id);
     };
 
     return (
@@ -66,7 +65,8 @@ const CardComponent = (props) => {
             </WrapperReportText>
             <WrapperPriceText>
                 <span style={{ marginRight: "8px" }}>
-                    {price.toLocaleString()}
+                    {/* {price.toLocaleString()} */}
+                    {price}
                 </span>
                 <WrapperDiscountPriceText>
                     - {discount}%

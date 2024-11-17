@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TypeProduct from "../../components/TypeProduct/TypeProduct";
 import {
     WrapperButtonMore,
@@ -22,7 +22,7 @@ const HomPage = () => {
     const searchDebounce = useDebounce(searchProduct, 1000);
     const [limit, setLimit] = useState(5);
     const [loading, setIsLoading] = useState(false);
-
+    const [typeProducts, setTypeProducts] = useState([]);
     const arr = ["TV", "Tu Lanh", "Laptop"];
 
     const fetchProductAll = async (context) => {
@@ -55,20 +55,39 @@ const HomPage = () => {
         }
         return stars;
     };
+
+    const fetchAllTypeProducts = async () => {
+        const res = await ProductService.getAllTypeProduct();
+        if (res?.status === "OK") {
+            setTypeProducts(res?.data || []);
+        } else {
+            console.error("Failed to fetch type products");
+            setTypeProducts([]);
+        }
+        // console.log("res  type: ", res);
+    };
+
+    useEffect(() => {
+        fetchAllTypeProducts();
+    }, []);
     return (
         <Loading isLoading={isLoading || loading}>
             <div style={{ marginTop: "60px" }}>
-                <div style={{ padding: "0 120px" }}>
+                <div style={{ padding: "0 120px", backgroundColor: "#fff" }}>
                     <WrapperTypeProduct>
-                        {arr.map((item) => {
-                            return <TypeProduct name={item} key={item} />;
-                        })}
+                        {typeProducts.length > 0 ? (
+                            typeProducts?.map((item, index) => (
+                                <TypeProduct name={item} key={index} />
+                            ))
+                        ) : (
+                            <div>No product types available</div> // Trường hợp không có dữ liệu
+                        )}
                     </WrapperTypeProduct>
                 </div>
                 <div
                     style={{
                         backgroundColor: "#efefef",
-                        padding: "0 120px",
+                        padding: "5px 120px",
                         width: "100%",
                     }}
                 >

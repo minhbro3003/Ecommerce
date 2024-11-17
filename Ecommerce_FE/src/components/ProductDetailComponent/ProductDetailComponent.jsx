@@ -1,5 +1,5 @@
 import { Col, Row, Image, Input } from "antd";
-import React from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import imageproduct from "../../assets/images/test1.jpeg";
 import imageproductSmall from "../../assets/images/test2.jpg";
@@ -16,8 +16,27 @@ import { WrapperStyleTextSell } from "../CardComponent/style";
 import ButtonComponent from "../ButtonComponent/ButtonComponent";
 import * as ProductService from "../../services/ProductService";
 import Loading from "../../components/LoadingComponent/Loading";
+import { useSelector } from "react-redux";
 
 const ProductDetailComponent = ({ idProduct }) => {
+    const [numberProduct, setNumberProduct] = useState(1);
+    const user = useSelector((state) => state.user);
+    console.log("user", user);
+    const onChangeNumber = (value) => {
+        const num = parseInt(value, 10);
+        if (!isNaN(num)) {
+            setNumberProduct(num);
+        }
+    };
+
+    const handleChangeCount = (type) => {
+        if (type === "increase") {
+            setNumberProduct(numberProduct + 1);
+        } else {
+            setNumberProduct(numberProduct > 1 ? numberProduct - 1 : 1);
+        }
+    };
+
     //details of product
     const fetchGetDetailsProduct = async (context) => {
         const id = context?.queryKey && context?.queryKey[1];
@@ -77,7 +96,12 @@ const ProductDetailComponent = ({ idProduct }) => {
                                     src={imageproductSmall}
                                     alt="image small"
                                     preview={false}
-                                    style={{ height: "64px", width: "64px" }}
+                                    style={{
+                                        height: "64px",
+                                        width: "64px",
+                                        objectFit: "cover",
+                                        borderRadius: "4px",
+                                    }}
                                 />
                             </Col>
                             <Col span={4}>
@@ -85,7 +109,12 @@ const ProductDetailComponent = ({ idProduct }) => {
                                     src={imageproductSmall}
                                     alt="image small"
                                     preview={false}
-                                    style={{ height: "64px", width: "64px" }}
+                                    style={{
+                                        height: "64px",
+                                        width: "64px",
+                                        objectFit: "cover",
+                                        borderRadius: "4px",
+                                    }}
                                 />
                             </Col>
                             <Col span={4}>
@@ -93,7 +122,12 @@ const ProductDetailComponent = ({ idProduct }) => {
                                     src={imageproductSmall}
                                     alt="image small"
                                     preview={false}
-                                    style={{ height: "64px", width: "64px" }}
+                                    style={{
+                                        height: "64px",
+                                        width: "64px",
+                                        objectFit: "cover",
+                                        borderRadius: "4px",
+                                    }}
                                 />
                             </Col>
                             <Col span={4}>
@@ -101,7 +135,12 @@ const ProductDetailComponent = ({ idProduct }) => {
                                     src={imageproductSmall}
                                     alt="image small"
                                     preview={false}
-                                    style={{ height: "64px", width: "64px" }}
+                                    style={{
+                                        height: "64px",
+                                        width: "64px",
+                                        objectFit: "cover",
+                                        borderRadius: "4px",
+                                    }}
                                 />
                             </Col>
                             <Col span={4}>
@@ -109,7 +148,12 @@ const ProductDetailComponent = ({ idProduct }) => {
                                     src={imageproductSmall}
                                     alt="image small"
                                     preview={false}
-                                    style={{ height: "64px", width: "64px" }}
+                                    style={{
+                                        height: "64px",
+                                        width: "64px",
+                                        objectFit: "cover",
+                                        borderRadius: "4px",
+                                    }}
                                 />
                             </Col>
                             <Col span={4}>
@@ -117,12 +161,17 @@ const ProductDetailComponent = ({ idProduct }) => {
                                     src={imageproductSmall}
                                     alt="image small"
                                     preview={false}
-                                    style={{ height: "64px", width: "64px" }}
+                                    style={{
+                                        height: "64px",
+                                        width: "64px",
+                                        objectFit: "cover",
+                                        borderRadius: "4px",
+                                    }}
                                 />
                             </Col>
                         </Row>
                     </Col>
-                    <Col span={14} style={{ padding: "10px" }}>
+                    <Col span={14} style={{ padding: "15px" }}>
                         <WrapperStyleNameProduct>
                             {productDetails?.name}
                         </WrapperStyleNameProduct>
@@ -138,39 +187,79 @@ const ProductDetailComponent = ({ idProduct }) => {
                             </WrapperPriceTextProduct>
                         </WrapperPriceProduct>
                         <WrapperAddressProduct>
-                            <span>Giao đến </span>
-                            <span className="address">
-                                Q. Hoàn Kiếm, P. Hàng Trống, Hà Nội
+                            <span
+                                style={{
+                                    fontSize: "18px",
+                                }}
+                            >
+                                Giao đến{" "}
                             </span>
-                            -<span className="change-address">Đổi địa chỉ</span>
+                            <span
+                                style={{
+                                    fontWeight: "400px",
+                                }}
+                                className="address"
+                            >
+                                {user?.address}
+                            </span>
+                            -
+                            <span className="change-address"> Đổi địa chỉ</span>
                         </WrapperAddressProduct>
                         <WrapperQualityProduct>
                             <div>Số lượng</div>
                             <WrapperBtQualityProduct>
-                                <MinusOutlined
+                                <button
                                     style={{
-                                        border: "1px solid #ccc",
-                                        borderRadius: "4px",
-                                        padding: "4px",
-                                        fontSize: "20px",
+                                        border: "none",
+                                        background: "transparent",
+                                        cursor: "pointer",
                                     }}
-                                />
+                                    onClick={() =>
+                                        handleChangeCount("decrease")
+                                    }
+                                >
+                                    <MinusOutlined
+                                        style={{
+                                            border: "1px solid #ccc",
+                                            borderRadius: "4px",
+                                            padding: "4px",
+                                            fontSize: "25px",
+                                        }}
+                                    />
+                                </button>
+
                                 <Input
                                     style={{
-                                        width: "30px",
+                                        width: "45px",
                                         margin: "0 10px",
-                                        height: "30px",
+                                        height: "37px",
+                                        fontSize: "18px",
+                                        textAlign: "center",
+                                        // color: "#000",
                                     }}
+                                    onChange={onChangeNumber}
+                                    value={numberProduct}
+                                    // defaultValue={1}
                                 />
-
-                                <PlusOutlined
+                                <button
                                     style={{
-                                        border: "1px solid #ccc",
-                                        borderRadius: "4px",
-                                        padding: "4px",
-                                        fontSize: "20px",
+                                        border: "none",
+                                        background: "transparent",
+                                        cursor: "pointer",
                                     }}
-                                />
+                                    onClick={() =>
+                                        handleChangeCount("increase")
+                                    }
+                                >
+                                    <PlusOutlined
+                                        style={{
+                                            border: "1px solid #ccc",
+                                            borderRadius: "4px",
+                                            padding: "4px",
+                                            fontSize: "25px",
+                                        }}
+                                    />
+                                </button>
                             </WrapperBtQualityProduct>
                             <div>
                                 <ButtonComponent

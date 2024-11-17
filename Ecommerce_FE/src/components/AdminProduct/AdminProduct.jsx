@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Button, Form, Space } from "antd";
+import { Button, Form, Select, Space } from "antd";
 import {
     DeleteOutlined,
     EditOutlined,
@@ -10,7 +10,7 @@ import TableComponent from "../TableComponent/TableComponent";
 import { WrapperHeader } from "./style";
 import InputComponent from "../InputComponent/InputComponent";
 import { WrapperUploadFile } from "../../pages/ProfilePage/style";
-import { getBase64 } from "../../utils";
+import { getBase64, renderOptions } from "../../utils";
 import * as ProductService from "../../services/ProductService";
 import { useMutationHooks } from "../../hooks/useMutationHook";
 import * as message from "../../components/Message/Message";
@@ -24,6 +24,7 @@ import Loading from "../LoadingComponent/Loading";
 const AdminProduct = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [rowSelected, setRowSelected] = useState("");
+    const [typeSelect, setTypeSelect] = useState("");
     const [isOpenDrawer, setIsOpenDrawer] = useState(false);
     const user = useSelector((state) => state?.user);
     const [isModalDelete, setIsModalDelete] = useState(false);
@@ -41,6 +42,7 @@ const AdminProduct = () => {
         rating: "",
         description: "",
         image: "",
+        newType: "",
     });
 
     const [stateProductDetails, setStateProductDetails] = useState({
@@ -89,7 +91,14 @@ const AdminProduct = () => {
         const res = ProductService.deleteManyProduct({ ids }, token);
         return res;
     });
-    console.log("mutationDeleteMany", mutationDeleteMany);
+    // console.log("mutationDeleteMany", mutationDeleteMany);
+
+    const fetchAllTypeProducts = async () => {
+        const res = await ProductService.getAllTypeProduct();
+        return res;
+
+        // console.log("res: ", res);
+    };
 
     const getAllProducts = async () => {
         const res = await ProductService.getAllProduct();
@@ -158,9 +167,14 @@ const AdminProduct = () => {
         queryKey: ["products"],
         queryFn: getAllProducts,
     });
+
+    const typeProducts = useQuery({
+        queryKey: ["type-products"],
+        queryFn: fetchAllTypeProducts,
+    });
     const { isLoading: isLoadingProducts, data: products = [] } = queryProduct;
 
-    // console.log("product: ", products);
+    console.log("type-product: ", typeProducts);
 
     //crete product
     useEffect(() => {
@@ -210,7 +224,20 @@ const AdminProduct = () => {
 
     //create product
     const onCreateProduct = () => {
-        mutationCreate.mutate(stateProduct, {
+        const params = {
+            name: stateProduct.name,
+            price: stateProduct.price,
+            type:
+                stateProduct.type === "add_type"
+                    ? stateProduct.newType
+                    : stateProduct.type,
+            countInStock: stateProduct.countInStock,
+            description: stateProduct.description,
+            image: stateProduct.image,
+            rating: stateProduct.rating,
+            newType: stateProduct.newType,
+        };
+        mutationCreate.mutate(params, {
             onSettled: () => {
                 queryProduct.refetch();
             },
@@ -239,7 +266,7 @@ const AdminProduct = () => {
             ...stateProduct,
             [e.target.name]: e.target.value,
         });
-        console.log("e.target", e.target.name, e.target.value);
+        // console.log("e.target", e.target.name, e.target.value);
     };
 
     //get details of product
@@ -274,7 +301,7 @@ const AdminProduct = () => {
         });
     };
 
-    console.log("state - product:", stateProductDetails);
+    // console.log("state - product:", stateProductDetails);
 
     //details of product
     useEffect(() => {
@@ -473,20 +500,6 @@ const AdminProduct = () => {
                 setTimeout(() => searchInput.current?.select(), 100);
             }
         },
-        // render: (text) =>
-        //     searchedColumn === dataIndex ? (
-        //         <Highlighter
-        //             highlightStyle={{
-        //                 backgroundColor: "#ffc069",
-        //                 padding: 0,
-        //             }}
-        //             searchWords={[searchText]}
-        //             autoEscape
-        //             textToHighlight={text ? text.toString() : ""}
-        //         />
-        //     ) : (
-        //         text
-        //     ),
     });
 
     const columns = [
@@ -557,8 +570,16 @@ const AdminProduct = () => {
         products?.data?.map((p) => {
             return { ...p, key: p._id };
         });
-    console.log("dataTable", dataTable);
+    // console.log("dataTable", dataTable);
 
+    const handleOnChangeSelect = (values) => {
+        setStateProduct({
+            ...stateProduct,
+            type: values,
+        });
+
+        console.log("value", stateProduct);
+    };
     return (
         <div>
             <WrapperHeader>Quản lý sản phẩm</WrapperHeader>
@@ -628,7 +649,7 @@ const AdminProduct = () => {
                                 name="name"
                             />
                         </Form.Item>
-
+                        {/* //=========================== */}
                         <Form.Item
                             label="Type"
                             name="type"
@@ -639,13 +660,38 @@ const AdminProduct = () => {
                                 },
                             ]}
                         >
-                            <InputComponent
-                                value={stateProduct.type}
-                                onChange={handleOnChange}
+                            <Select
                                 name="type"
+                                value={stateProduct.type}
+                                // style={{ width: 120 }}
+                                onChange={handleOnChangeSelect}
+                                options={renderOptions(
+                                    typeProducts?.data?.data
+                                )}
                             />
                         </Form.Item>
+                        {/* //=========================== */}
+                        {stateProduct.type === "add_type" && (
+                            <Form.Item
+                                style={{ color: "green" }}
+                                label="New Type"
+                                name="newType"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Please input your type!",
+                                    },
+                                ]}
+                            >
+                                <InputComponent
+                                    value={stateProduct.newType}
+                                    onChange={handleOnChange}
+                                    name="newType"
+                                />
+                            </Form.Item>
+                        )}
 
+                        {/* //=========================== */}
                         <Form.Item
                             label="Count In Stock"
                             name="countInStock"

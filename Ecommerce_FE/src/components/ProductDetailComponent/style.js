@@ -27,13 +27,14 @@ export const WrapperPriceTextProduct = styled.h1`
     margin-right: 8px;
     font-weight: 500;
     padding: 10px;
+    margin-top: 10px;
 `;
 
 export const WrapperAddressProduct = styled.div`
     span.address {
         text-decoration: underline;
-        font-size: 15px;
-        line-height: 24px;
+        font-size: 20px;
+        line-height: 30px;
         font-weight: 500;
         white-space: nowrap;
         overflow: hidden;
@@ -41,7 +42,7 @@ export const WrapperAddressProduct = styled.div`
     }
     span.change-address {
         color: rgb(10, 104, 255);
-        font-size: 16px;
+        font-size: 20px;
         line-height: 24px;
         font-weight: 500;
     }
