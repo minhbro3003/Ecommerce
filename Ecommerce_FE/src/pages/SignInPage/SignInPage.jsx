@@ -9,7 +9,7 @@ import InputFormComponent from "../../components/InputFormComponent/InputFormCom
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
 import { Image } from "antd";
 import imageLogo from "../../assets/images/login.png";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import * as UserService from "../../services/UserSevice";
 import { useMutationHooks } from "../../hooks/useMutationHook";
 import * as message from "../../components/Message/Message";
@@ -19,6 +19,7 @@ import { updateUser } from "../../redux/slides/useSlide";
 
 const SignInPage = () => {
     const [isShowPassword, setIsShowPassword] = useState(false);
+    const location = useLocation();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const dispatch = useDispatch();
@@ -34,8 +35,13 @@ const SignInPage = () => {
     useEffect(() => {
         console.log("isSuccess", isSuccess);
         if (isSuccess) {
-            navigate("/");
-            console.log("data", data);
+            if (location?.state) {
+                navigate(location?.state);
+            } else {
+                navigate("/");
+            }
+
+            // console.log("data", data);
             localStorage.setItem(
                 "access_token",
                 JSON.stringify(data?.access_token)

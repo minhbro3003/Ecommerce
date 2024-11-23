@@ -9,6 +9,7 @@ import {
 } from "./style";
 import logo from "../../assets/images/image.png";
 import { useNavigate } from "react-router";
+import { convertPrice } from "../../utils";
 
 const CardComponent = (props) => {
     const {
@@ -66,7 +67,7 @@ const CardComponent = (props) => {
             <WrapperPriceText>
                 <span style={{ marginRight: "8px" }}>
                     {/* {price.toLocaleString()} */}
-                    {price}
+                    {convertPrice(price)}
                 </span>
                 <WrapperDiscountPriceText>
                     - {discount}%

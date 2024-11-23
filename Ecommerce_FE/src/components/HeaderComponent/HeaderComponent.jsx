@@ -19,6 +19,7 @@ import * as UserService from "../../services/UserSevice";
 import { resetUser } from "../../redux/slides/useSlide";
 import Loading from "../LoadingComponent/Loading";
 import { searchProduct } from "../../redux/slides/productSlide";
+import Search from "antd/es/transfer/search";
 
 const HeaderComponent = ({ isHidenSearch = false, isHidenCart = false }) => {
     const navigate = useNavigate();
@@ -27,6 +28,7 @@ const HeaderComponent = ({ isHidenSearch = false, isHidenCart = false }) => {
     const [userAvartar, setUserAvartar] = useState("");
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
+    const order = useSelector((state) => state.order);
     const user = useSelector((state) => state.user);
     // console.log("user count: ", user);
 
@@ -166,7 +168,10 @@ const HeaderComponent = ({ isHidenSearch = false, isHidenCart = false }) => {
                             onClick={() => navigate("/order")}
                             style={{ cursor: "pointer" }}
                         >
-                            <Badge count={4} size="small">
+                            <Badge
+                                count={order?.orderItems?.length}
+                                size="small"
+                            >
                                 <ShoppingCartOutlined
                                     style={{ fontSize: "30px", color: "#fff" }}
                                 />

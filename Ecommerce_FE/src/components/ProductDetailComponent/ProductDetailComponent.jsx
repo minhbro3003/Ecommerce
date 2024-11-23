@@ -16,11 +16,18 @@ import { WrapperStyleTextSell } from "../CardComponent/style";
 import ButtonComponent from "../ButtonComponent/ButtonComponent";
 import * as ProductService from "../../services/ProductService";
 import Loading from "../../components/LoadingComponent/Loading";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router";
+import { addOrderProduct } from "../../redux/slides/orderSlide";
+import { convertPrice } from "../../utils";
 
 const ProductDetailComponent = ({ idProduct }) => {
     const [numberProduct, setNumberProduct] = useState(1);
     const user = useSelector((state) => state.user);
+    const navigate = useNavigate();
+    const location = useLocation();
+    const dispatch = useDispatch();
+
     console.log("user", user);
     const onChangeNumber = (value) => {
         const num = parseInt(value, 10);
@@ -28,7 +35,7 @@ const ProductDetailComponent = ({ idProduct }) => {
             setNumberProduct(num);
         }
     };
-
+    console.log("location: ", location);
     const handleChangeCount = (type) => {
         if (type === "increase") {
             setNumberProduct(numberProduct + 1);
@@ -61,6 +68,36 @@ const ProductDetailComponent = ({ idProduct }) => {
         }
         return stars;
     };
+
+    const handleAddOrderProduct = () => {
+        if (!user?.id) {
+            navigate("/sign-in", { state: location?.pathname });
+        } else {
+            // name: { type: String, required: true },
+            //     amount: { type: Number, required: true },
+            //     image: { type: String, required: true },
+            //     price: { type: Number, required: true },
+            //     product: {
+            //         type: mongoose.Schema.Types.ObjectId,
+            //         ref: "Product",
+            //         required: true,
+            //     },
+            dispatch(
+                addOrderProduct({
+                    orderItem: {
+                        name: productDetails?.name,
+                        amount: numberProduct,
+                        discount: productDetails?.discount,
+                        countInStock: productDetails?.countInStock,
+                        image: productDetails?.image,
+                        price: productDetails?.price,
+                        product: productDetails?._id,
+                    },
+                })
+            );
+        }
+    };
+    console.log("productDetails", productDetails, user);
 
     return (
         <Loading isLoading={isLoading}>
@@ -183,7 +220,7 @@ const ProductDetailComponent = ({ idProduct }) => {
                         </div>
                         <WrapperPriceProduct>
                             <WrapperPriceTextProduct>
-                                {productDetails?.price.toLocaleString()}
+                                {convertPrice(productDetails?.price)}
                             </WrapperPriceTextProduct>
                         </WrapperPriceProduct>
                         <WrapperAddressProduct>
@@ -271,6 +308,7 @@ const ProductDetailComponent = ({ idProduct }) => {
                                         width: "200px",
                                         height: "48px",
                                     }}
+                                    onClick={handleAddOrderProduct}
                                     textButton="Chọn mua"
                                 ></ButtonComponent>
                                 <ButtonComponent

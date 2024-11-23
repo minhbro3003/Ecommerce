@@ -12,7 +12,7 @@ const ProductDetailsPage = () => {
                     marginTop: "60px",
                     padding: "0 120px",
                     backgroundColor: "#efefef",
-                    height: "1200px",
+                    // height: "400px",
                 }}
             >
                 <h2 style={{ paddingTop: "15px" }}>Chi tiết sản phẩm </h2>

@@ -42,6 +42,7 @@ const AdminProduct = () => {
         rating: "",
         description: "",
         image: "",
+        discount: "",
         newType: "",
     });
 
@@ -53,12 +54,21 @@ const AdminProduct = () => {
         rating: "",
         description: "",
         image: "",
+        discount: "",
     });
 
     //create product
     const mutationCreate = useMutationHooks((data) => {
-        const { name, type, countInStock, price, rating, description, image } =
-            data;
+        const {
+            name,
+            type,
+            countInStock,
+            price,
+            rating,
+            description,
+            image,
+            discount,
+        } = data;
         const res = ProductService.createProduct({
             name,
             type,
@@ -67,6 +77,7 @@ const AdminProduct = () => {
             rating,
             description,
             image,
+            discount,
         });
         return res;
     });
@@ -117,6 +128,7 @@ const AdminProduct = () => {
             rating: "",
             description: "",
             image: "",
+            discount: "",
         });
         form.resetFields();
     }, [form]);
@@ -132,6 +144,7 @@ const AdminProduct = () => {
             rating: "",
             description: "",
             image: "",
+            discount: "",
         });
         form.resetFields();
     }, [form]);
@@ -235,6 +248,7 @@ const AdminProduct = () => {
             description: stateProduct.description,
             image: stateProduct.image,
             rating: stateProduct.rating,
+            discount: stateProduct.discount,
             newType: stateProduct.newType,
         };
         mutationCreate.mutate(params, {
@@ -331,6 +345,7 @@ const AdminProduct = () => {
                 rating: res?.data?.rating,
                 description: res?.data?.description,
                 image: res?.data?.image,
+                discount: res?.data?.discount,
             });
         }
         setIsLoadingUpdate(false);
@@ -509,6 +524,7 @@ const AdminProduct = () => {
             // render: (text) => <a>{text}</a>,
             sorter: (a, b) => a.name.length - b.name.length,
             ...getColumnSearchProps("name"),
+            width: "25%",
         },
         {
             title: "Price",
@@ -530,7 +546,10 @@ const AdminProduct = () => {
                 }
                 return record.price <= 10000000;
             },
-            width: "20%",
+        },
+        {
+            title: "Discount",
+            dataIndex: "discount",
         },
         {
             title: "Rating",
@@ -552,7 +571,6 @@ const AdminProduct = () => {
                 }
                 return record.rating <= 5;
             },
-            width: "20%",
         },
         {
             title: "Type",
@@ -727,6 +745,14 @@ const AdminProduct = () => {
                             />
                         </Form.Item>
 
+                        <Form.Item label="Discount" name="discount">
+                            <InputComponent
+                                value={stateProduct.discount}
+                                onChange={handleOnChange}
+                                name="discount"
+                            />
+                        </Form.Item>
+
                         <Form.Item
                             label="Rating"
                             name="rating"
@@ -893,6 +919,14 @@ const AdminProduct = () => {
                                     value={stateProductDetails.price}
                                     onChange={handleOnChangeDetails}
                                     name="price"
+                                />
+                            </Form.Item>
+
+                            <Form.Item label="Discount" name="discount">
+                                <InputComponent
+                                    value={stateProductDetails.discount}
+                                    onChange={handleOnChange}
+                                    name="discount"
                                 />
                             </Form.Item>
 

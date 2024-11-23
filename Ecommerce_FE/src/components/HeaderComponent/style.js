@@ -28,7 +28,7 @@ export const WrapperHeaderAccount = styled.div`
     color: #fff;
     gap: 10px;
     font-size: 12px;
-    margin-left: 15px;
+    margin-left: 35px;
 `;
 
 export const WrapperTextHeaderSmall = styled.span`
