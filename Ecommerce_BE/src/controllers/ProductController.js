@@ -2,10 +2,18 @@ const ProductService = require("../services/ProductService");
 
 const createProduct = async (req, res) => {
     try {
-        const { name, image, type, price, countInStock, rating, description } =
-            req.body;
+        const {
+            name,
+            image,
+            type,
+            price,
+            countInStock,
+            rating,
+            description,
+            discount,
+        } = req.body;
         // console.log("req.body", req.body);
-        if (!name || !image || !type || !price || !countInStock || !rating) {
+        if (!name || !image || !type || !price || !countInStock) {
             return res
                 .status(200)
                 .json({ status: "ERR", message: "The input is required." });
@@ -138,7 +146,7 @@ const getAllProduct = async (req, res) => {
         const { limit, page, sort, filter } = req.query;
         // console.log("req.query", req.query);
         const product = await ProductService.getAllProduct(
-            Number(limit) || 10,
+            Number(limit) || null,
             Number(page) || 0,
             sort,
             filter
