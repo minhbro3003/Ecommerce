@@ -22,7 +22,9 @@ routes(app);
 mongoose
     .connect(`${process.env.MONGO_DB}`)
     .then(() => {
-        console.log("Connected to MongoDB! ");
+        console.log(
+            `Connected to MongoDB Database: ${mongoose.connection.name} : ${mongoose.connection.host}`
+        );
     })
     .catch((err) => {
         console.error("Error connecting to MongoDB   - ", err);
