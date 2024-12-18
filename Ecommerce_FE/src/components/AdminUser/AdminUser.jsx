@@ -63,7 +63,7 @@ const AdminUser = () => {
     // console.log("mutationDeleteMany", mutationDeleteMany);
 
     const getAllUsers = async () => {
-        const res = await UserSevice.getAllUser();
+        const res = await UserSevice.getAllUser(user?.access_token);
         console.log("resUser: ", res);
         return res;
     };
@@ -432,11 +432,16 @@ const AdminUser = () => {
             title: "Phone",
             dataIndex: "phone",
             ...getColumnSearchProps("phone"),
+            width: "15%",
         },
         {
             title: "Address",
             dataIndex: "address",
             // ...getColumnSearchProps("address"),
+        },
+        {
+            title: "City",
+            dataIndex: "city",
         },
         {
             title: "Action",

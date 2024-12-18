@@ -6,6 +6,7 @@ export const WrapperHeader = styled.h1`
     font-size: 24px;
     margin: 4px 0;
     margin-top: 70px;
+    padding: 0 120px;
 `;
 
 export const WrapperContentProfile = styled.div`
@@ -19,6 +20,7 @@ export const WrapperContentProfile = styled.div`
     margin-top: 40px;
     border-radius: 10px;
     gap: 20px;
+    background-color: #fff;
 `;
 
 export const WrapperLable = styled.label`
