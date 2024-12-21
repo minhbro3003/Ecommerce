@@ -17,6 +17,7 @@ import { useMutationHooks } from "../../hooks/useMutationHook";
 import * as UserSevice from "../../services/UserSevice";
 import Loading from "../../components/LoadingComponent/Loading";
 import { useNavigate } from "react-router";
+import StepComponent from "../../components/StepComponent/StepComponent";
 
 const OrderPage = () => {
     const dispatch = useDispatch();
@@ -298,7 +299,13 @@ const OrderPage = () => {
     }, [order]);
 
     const diliveryPriceMemo = useMemo(() => {
-        return priceMemo > 10000000 ? 10000 : priceMemo === 0 ? 0 : 20000;
+        return priceMemo === 0
+            ? 0
+            : priceMemo >= 500000
+            ? 0
+            : priceMemo > 200000
+            ? 10000
+            : 20000;
     }, [priceMemo]);
 
     const totalPriceMemo = useMemo(() => {
@@ -311,11 +318,46 @@ const OrderPage = () => {
             .reduce((sum, item) => sum + item.total, 0); // Tính tổng thành tiền của sản phẩm được chọn
     }, [cartData, listChecked]);
 
+    const itemsDilivery = [
+        {
+            title: "20k",
+            description: "Dưới 200k",
+        },
+        {
+            title: "10k",
+            description: "Từ 200k đến 500k",
+            subTitle: "Left 00:00:08",
+        },
+        {
+            title: "0k",
+            description: "Trên 500k",
+        },
+    ];
+
+    const currentStep = useMemo(() => {
+        if (priceMemo === 0) {
+            return -1;
+        } else if (diliveryPriceMemo === 20000) {
+            return 0;
+        } else if (diliveryPriceMemo === 10000) {
+            return 1;
+        } else {
+            return 2;
+        }
+    }, [priceMemo, diliveryPriceMemo]);
+
     return (
         <div style={{ margin: "80px 0", padding: "0 120px" }}>
             <h4>Giỏ hàng</h4>
+
             <div style={{ display: "flex", gap: 24 }}>
                 <div style={{ flex: 3 }}>
+                    <div style={{ padding: "10px 0px" }}>
+                        <StepComponent
+                            items={itemsDilivery}
+                            current={currentStep}
+                        />
+                    </div>
                     <Table
                         columns={columns}
                         dataSource={cartData}

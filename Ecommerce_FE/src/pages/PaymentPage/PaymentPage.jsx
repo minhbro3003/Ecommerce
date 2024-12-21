@@ -155,7 +155,7 @@ const PaymentPage = () => {
                 },
             });
         } else if (isError) {
-            message.error();
+            message.error("Đặt hàng thất bại");
         }
     }, [isSuccess, isError]);
 
