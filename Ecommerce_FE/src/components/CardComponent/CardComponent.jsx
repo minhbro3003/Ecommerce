@@ -28,7 +28,7 @@ const CardComponent = (props) => {
     const navigate = useNavigate();
     const handleDetailsProduct = (id) => {
         navigate(`/product-details/${id}`);
-        // console.log("Product ID:", id);
+        console.log("Product ID:", id);
     };
 
     return (

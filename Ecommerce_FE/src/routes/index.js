@@ -8,7 +8,7 @@ import SignUpPage from "../pages/SignUpPage/SignUpPage";
 import TypeProductPage from "../pages/TypeProductPage/TypeProductPage";
 import ProfilePage from "../pages/ProfilePage/ProfilePage";
 import AdminPage from "../pages/AdminPage/AdminPage";
-import PaymentPage from "../pages/PaymentPage1/PaymentPage";
+import PaymentPage from "../pages/PaymentPage/PaymentPage";
 
 export const routes = [
     {

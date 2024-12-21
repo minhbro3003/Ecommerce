@@ -73,25 +73,25 @@ export default function App() {
     //     }
     // );
 
-    const handleGetDetailsUser = async (id, token) => {
-        const res = await UserService.getDetailsUser(id, token);
-        dispatch(updateUser({ ...res?.data, access_token: token }));
-
-        // console.log("res", res);
-    };
-
     // const handleGetDetailsUser = async (id, token) => {
-    //     try {
-    //         const res = await UserService.getDetailsUser(id, token);
-    //         if (res?.data) {
-    //             dispatch(updateUser({ ...res.data, access_token: token }));
-    //         }
-    //     } catch (error) {
-    //         console.error("Error fetching user details:", error);
-    //     } finally {
-    //         setIsLoading(false); // Stop loading once finished
-    //     }
+    //     const res = await UserService.getDetailsUser(id, token);
+    //     dispatch(updateUser({ ...res?.data, access_token: token }));
+
+    //     // console.log("res", res);
     // };
+
+    const handleGetDetailsUser = async (id, token) => {
+        try {
+            const res = await UserService.getDetailsUser(id, token);
+            if (res?.data) {
+                dispatch(updateUser({ ...res.data, access_token: token }));
+            }
+        } catch (error) {
+            console.error("Error fetching user details:", error);
+        } finally {
+            setIsLoading(false); // Stop loading once finished
+        }
+    };
 
     return (
         <div>

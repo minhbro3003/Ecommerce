@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Button, Card, Checkbox, Form, Table } from "antd";
 import { DeleteOutlined, LineOutlined, PlusOutlined } from "@ant-design/icons";
@@ -8,6 +8,7 @@ import {
     decreaseAmount,
     removeOrderProduct,
     removeAllOrderProduct,
+    selectedOrder,
 } from "../../redux/slides/orderSlide";
 import { convertPrice } from "../../utils";
 import ModalComponent from "../../components/ModalComponent/ModalComponent";
@@ -19,7 +20,7 @@ import { useNavigate } from "react-router";
 
 const OrderPage = () => {
     const dispatch = useDispatch();
-    const order = useSelector((state) => state.order.orderItems);
+    const order = useSelector((state) => state.order);
     const user = useSelector((state) => state.user);
     const [isOpenModalUpdateInfo, setIsOpenModalUpdateInfo] = useState(false);
     const [listChecked, setListChecked] = useState([]);
@@ -32,7 +33,7 @@ const OrderPage = () => {
         address: "",
     });
 
-    const cartData = order?.map((item) => ({
+    const cartData = order?.orderItems?.map((item) => ({
         key: item.product,
         image: item.image,
         name: item.name,
@@ -41,6 +42,7 @@ const OrderPage = () => {
         quantity: item.amount,
         total: item.amount * item.price * (1 - item.discount / 100),
     }));
+    console.log("order: ", order);
 
     useEffect(() => {
         if (isOpenModalUpdateInfo) {
@@ -67,6 +69,10 @@ const OrderPage = () => {
             setListChecked([...listChecked, e.target.value]);
         }
     };
+
+    useEffect(() => {
+        dispatch(selectedOrder({ listChecked }));
+    }, [listChecked]);
 
     const handleChangeAddress = () => {
         setIsOpenModalUpdateInfo(true);
@@ -274,42 +280,36 @@ const OrderPage = () => {
         },
     ];
 
-    const calculateSummary = () => {
-        const selectedProducts = cartData.filter((item) =>
-            listChecked.includes(item.key)
-        );
+    const priceMemo = useMemo(() => {
+        const result = order?.orderItemsSlected?.reduce((total, cur) => {
+            return total + cur.price * cur.amount * (1 - cur.discount / 100);
+        }, 0);
+        return result;
+    }, [order]);
 
-        if (selectedProducts.length === 0) {
-            return {
-                subTotal: 0,
-                discount: 0,
-                tax: 0,
-                shipping: 0,
-                total: 0,
-            };
+    const priceDiscountMemo = useMemo(() => {
+        const result = order?.orderItemsSlected?.reduce((total, cur) => {
+            return total + cur.discount * cur.amount;
+        }, 0);
+        if (Number(result)) {
+            return result;
         }
+        return 0;
+    }, [order]);
 
-        const subTotal = selectedProducts.reduce(
-            (acc, item) => acc + item.total,
-            0
-        );
-        const discountProduct = selectedProducts.reduce(
-            (acc, item) =>
-                acc + item.price * (item.discount / 100) * item.quantity,
-            0
-        );
-        const shippingFee = subTotal > 10000000 ? 10000 : 20000;
+    const diliveryPriceMemo = useMemo(() => {
+        return priceMemo > 10000000 ? 10000 : priceMemo === 0 ? 0 : 20000;
+    }, [priceMemo]);
 
-        return {
-            subTotal,
-            discount: discountProduct,
-            tax: 0,
-            shipping: shippingFee,
-            total: subTotal - discountProduct + shippingFee,
-        };
-    };
+    const totalPriceMemo = useMemo(() => {
+        return priceMemo + diliveryPriceMemo;
+    }, [priceMemo, diliveryPriceMemo]);
 
-    const summary = calculateSummary();
+    const totalSummary = useMemo(() => {
+        return cartData
+            .filter((item) => listChecked.includes(item.key)) // Lọc sản phẩm được chọn
+            .reduce((sum, item) => sum + item.total, 0); // Tính tổng thành tiền của sản phẩm được chọn
+    }, [cartData, listChecked]);
 
     return (
         <div style={{ margin: "80px 0", padding: "0 120px" }}>
@@ -336,7 +336,7 @@ const OrderPage = () => {
                                                 fontWeight: "bold",
                                             }}
                                         >
-                                            {convertPrice(summary.subTotal)} VND
+                                            {convertPrice(totalSummary)} VND
                                         </span>
                                     </Table.Summary.Cell>
                                 </Table.Summary.Row>
@@ -349,7 +349,7 @@ const OrderPage = () => {
                         <span>Địa chỉ: </span>
                         <span
                             style={{ fontWeight: "bold" }}
-                        >{`${user?.address} ${user?.city}`}</span>
+                        >{`${user?.address} ${user?.city}  `}</span>
                         <span
                             onClick={handleChangeAddress}
                             style={{ color: "blue", cursor: "pointer" }}
@@ -358,15 +358,19 @@ const OrderPage = () => {
                         </span>
                     </div>
                     <hr />
-                    <p>Tạm tính: {convertPrice(summary.subTotal)} VND</p>
-                    <p>Giảm giá: {convertPrice(summary.discount)} VND</p>
+                    <p>Tạm tính tien: {convertPrice(priceMemo)} VND</p>
+                    {/* <p>Tạm tính: {convertPrice(summary.subTotal)} VND</p> */}
+                    <p>Giảm giá tien: {priceDiscountMemo} %</p>
+                    {/* <p>Giảm giá: {convertPrice(summary.discount)} VND</p> */}
                     <p>Thuế: 0</p>
-                    <p>Phí giao hàng: {convertPrice(summary.shipping)} VND</p>
+                    <p>Phí giao hàng: {convertPrice(diliveryPriceMemo)} VND</p>
+                    {/* <p>Phí giao hàng: {convertPrice(summary.shipping)} VND</p> */}
                     <hr />
                     <h3>
                         Tổng tiền:{" "}
                         <span style={{ color: "red" }}>
-                            {convertPrice(summary.total)} VND
+                            {convertPrice(totalPriceMemo)} VND
+                            {/* {convertPrice(summary.total)} VND */}
                         </span>
                     </h3>
                     <Tooltip title="Vui lòng chọn sản phẩm trước khi mua!">
