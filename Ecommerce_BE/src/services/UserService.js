@@ -173,20 +173,24 @@ const getDetailsUser = (id) => {
     return new Promise(async (resolve, reject) => {
         try {
             const user = await User.findOne({ _id: id }); //_id
-            if (user === null) {
-                resolve({
+            if (!user) {
+                return resolve({
                     status: "ERR",
                     message: "The user is not defined",
                 });
             }
 
-            resolve({
+            return resolve({
                 status: "OK",
-                message: "User successfully",
+                message: "User successfully retrieved",
                 data: user,
             });
         } catch (e) {
-            reject(e);
+            return reject({
+                status: "ERR",
+                message: "Database query failed",
+                error: e.message,
+            });
         }
     });
 };

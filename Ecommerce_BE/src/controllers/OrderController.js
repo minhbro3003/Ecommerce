@@ -21,7 +21,7 @@ const createOrder = async (req, res) => {
             !fullName ||
             !address ||
             !city ||
-            phone
+            !phone
         ) {
             return res
                 .status(200)
@@ -32,7 +32,7 @@ const createOrder = async (req, res) => {
         return res.status(200).json(product);
     } catch (e) {
         return res.status(404).json({
-            message: "Product creation failed",
+            message: "Order product failed",
             error: e.message,
         });
     }

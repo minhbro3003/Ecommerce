@@ -153,17 +153,25 @@ const getDetailsUser = async (req, res) => {
         const userId = req.params.id;
 
         if (!userId) {
-            return res.status(200).json({
+            return res.status(400).json({
                 status: "ERR",
                 message: "The userId is required",
             });
         }
-        const user = await UserService.getDetailsUser(userId);
 
-        return res.status(200).json(user);
+        const userResponse = await UserService.getDetailsUser(userId);
+
+        // Nếu không tìm thấy user
+        if (userResponse.status === "ERR") {
+            return res.status(404).json(userResponse);
+        }
+
+        // Trả về kết quả thành công
+        return res.status(200).json(userResponse);
     } catch (e) {
-        return res.status(404).json({
-            message: "! User creation failed 'SOS'!",
+        return res.status(500).json({
+            status: "ERR",
+            message: "Server error occurred",
             error: e.message,
         });
     }
