@@ -21,7 +21,7 @@ const OrderSucess = () => {
     return (
         <div
             style={{
-                background: "#f5f5fa",
+                // background: "#f5f5fa",
                 with: "100%",
                 height: "100vh",
                 marginTop: "70px",
@@ -82,8 +82,8 @@ const OrderSucess = () => {
                                                 <img
                                                     src={order?.image}
                                                     style={{
-                                                        width: "77px",
-                                                        height: "79px",
+                                                        width: "50px",
+                                                        height: "50px",
                                                         objectFit: "cover",
                                                     }}
                                                 />
@@ -114,10 +114,14 @@ const OrderSucess = () => {
                                                             color: "#242424",
                                                         }}
                                                     >
-                                                        Giá tiền:{" "}
+                                                        Giá tiền:
                                                         {convertPrice(
-                                                            order?.price
-                                                        )}
+                                                            order?.price *
+                                                                (1 -
+                                                                    order?.discount /
+                                                                        100)
+                                                        )}{" "}
+                                                        VND
                                                     </span>
                                                 </span>
                                                 <span>
@@ -145,7 +149,7 @@ const OrderSucess = () => {
                                     }}
                                 >
                                     Tổng tiền:{" "}
-                                    {convertPrice(state?.totalPriceMemo)}
+                                    {convertPrice(state?.totalPriceMemo)} VND
                                 </span>
                             </div>
                         </WrapperContainer>

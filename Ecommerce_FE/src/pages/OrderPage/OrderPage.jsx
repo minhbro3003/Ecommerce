@@ -348,16 +348,25 @@ const OrderPage = () => {
 
     return (
         <div style={{ margin: "80px 0", padding: "0 120px" }}>
-            <h4>Giỏ hàng</h4>
+            <h2>Giỏ hàng</h2>
 
             <div style={{ display: "flex", gap: 24 }}>
                 <div style={{ flex: 3 }}>
-                    <div style={{ padding: "10px 0px" }}>
+                    <div
+                        style={{
+                            padding: "10px 0px",
+                            backgroundColor: "#fff",
+                            padding: " 10px",
+                            borderRadius: 8,
+                            boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+                        }}
+                    >
                         <StepComponent
                             items={itemsDilivery}
                             current={currentStep}
                         />
                     </div>
+                    <hr />
                     <Table
                         columns={columns}
                         dataSource={cartData}

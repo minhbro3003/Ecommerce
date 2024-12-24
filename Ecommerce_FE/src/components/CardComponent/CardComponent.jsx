@@ -60,9 +60,7 @@ const CardComponent = (props) => {
                     <span>{rating}</span>{" "}
                 </span>
 
-                <WrapperStyleTextSell>
-                    | Đã bán {countInStock}
-                </WrapperStyleTextSell>
+                <WrapperStyleTextSell>| Đã bán {selled}</WrapperStyleTextSell>
             </WrapperReportText>
             <WrapperPriceText>
                 <span style={{ marginRight: "8px" }}>
