@@ -10,6 +10,7 @@ const createProduct = (newProduct) => {
             countInStock,
             rating,
             description,
+            selled,
             discount,
         } = newProduct;
         try {
@@ -32,6 +33,7 @@ const createProduct = (newProduct) => {
                 countInStock,
                 rating,
                 description,
+                selled,
                 discount,
             });
             if (newProduct) {

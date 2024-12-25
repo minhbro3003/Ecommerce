@@ -11,6 +11,7 @@ const createOrder = async (req, res) => {
             address,
             city,
             phone,
+            orderItems,
         } = req.body;
         console.log("req.body.payment ", req.body);
         if (
@@ -21,17 +22,18 @@ const createOrder = async (req, res) => {
             !fullName ||
             !address ||
             !city ||
-            !phone
+            !phone ||
+            !orderItems.length
         ) {
             return res
-                .status(200)
+                .status(400)
                 .json({ status: "ERR", message: "The input is required." });
         }
 
         const product = await OrderService.createOrder(req.body);
         return res.status(200).json(product);
     } catch (e) {
-        return res.status(404).json({
+        return res.status(500).json({
             message: "Order product failed",
             error: e.message,
         });
@@ -63,13 +65,15 @@ const getDetailsOrder = async (req, res) => {
         if (!orderId) {
             return res.status(200).json({
                 status: "ERR",
-                message: "The userId is required",
+                message: "The orderId is required",
+                data: null,
             });
         }
         const response = await OrderService.getOrderDetails(orderId);
+        console.log("Order Details Response:", response);
         return res.status(200).json(response);
     } catch (e) {
-        // console.log(e)
+        console.log(e);
         return res.status(404).json({
             message: e,
         });
