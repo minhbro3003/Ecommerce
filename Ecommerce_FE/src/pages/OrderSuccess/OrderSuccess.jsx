@@ -145,7 +145,8 @@ const OrderSucess = () => {
                                     style={{
                                         fontSize: "16px",
                                         color: "red",
-                                        paddingTop: "10px",
+                                        padding: "10px 0",
+                                        fontWeight: "bold",
                                     }}
                                 >
                                     Tổng tiền:{" "}

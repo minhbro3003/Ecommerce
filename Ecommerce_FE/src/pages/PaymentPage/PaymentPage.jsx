@@ -257,7 +257,6 @@ const PaymentPage = () => {
     return (
         <div
             style={{
-                background: "#f5f5fa",
                 with: "100%",
                 height: "100vh",
                 paddingTop: "70px",
