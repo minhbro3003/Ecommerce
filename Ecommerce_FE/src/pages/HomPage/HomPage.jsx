@@ -19,11 +19,10 @@ import { useDebounce } from "../../hooks/useDebounce";
 
 const HomPage = () => {
     const searchProduct = useSelector((state) => state?.product?.search);
-    const searchDebounce = useDebounce(searchProduct, 1000);
+    const searchDebounce = useDebounce(searchProduct || "", 1000);
     const [limit, setLimit] = useState(10);
     const [loading, setIsLoading] = useState(false);
     const [typeProducts, setTypeProducts] = useState([]);
-    const arr = ["TV", "Tu Lanh", "Laptop"];
 
     const fetchProductAll = async (context) => {
         const search = context?.queryKey && context?.queryKey[2];
@@ -40,7 +39,6 @@ const HomPage = () => {
     } = useQuery({
         queryKey: ["products", limit, searchDebounce],
         queryFn: fetchProductAll,
-
         retry: 3,
         retryDelay: 1000,
     });
@@ -70,6 +68,8 @@ const HomPage = () => {
     useEffect(() => {
         fetchAllTypeProducts();
     }, []);
+    // console.log("Length:", products?.data?.length);
+    // console.log("Total:", products?.total);
     return (
         <Loading isLoading={isLoading || loading}>
             <div style={{ marginTop: "60px" }}>
@@ -93,8 +93,8 @@ const HomPage = () => {
                 >
                     <SliderComponent arrImages={[slider1, slider2, slider3]} />
                     <WrapperProducts>
-                        {products?.data?.map((p) => {
-                            return (
+                        {products?.data?.length > 0 ? (
+                            products.data.map((p) => (
                                 <CardComponent
                                     key={p._id}
                                     countInStock={p.countInStock}
@@ -108,35 +108,47 @@ const HomPage = () => {
                                     selled={p.selled}
                                     id={p._id}
                                 />
-                            );
-                        })}
+                            ))
+                        ) : (
+                            <div
+                                style={{
+                                    textAlign: "center",
+                                    padding: "20px",
+                                    backgroundColor: "ButtonFace",
+                                }}
+                            >
+                                Không tìm thấy sản phẩm
+                            </div>
+                        )}
                     </WrapperProducts>
-                    <div
-                        style={{
-                            display: "flex",
-                            justifyContent: "center",
-                            width: "100%",
-                        }}
-                    >
-                        <WrapperButtonMore
-                            textButton="Xem them"
-                            type="outline"
+                    {products?.data?.length > 0 && (
+                        <div
                             style={{
-                                border: "1px solid  rgb(11, 116, 229)",
-                                color: "rgb(11, 116, 229)",
-                                width: "240px",
-                                height: "38px",
-                                borderRadius: "4px",
-                                margin: "15px",
+                                display: "flex",
+                                justifyContent: "center",
+                                width: "100%",
                             }}
-                            disabled={
-                                products?.total === products?.data?.length
-                            }
-                            onClick={() => {
-                                setLimit((prev) => prev + 5);
-                            }}
-                        />
-                    </div>
+                        >
+                            <WrapperButtonMore
+                                textButton="Xem thêm"
+                                type="outline"
+                                style={{
+                                    border: "1px solid rgb(11, 116, 229)",
+                                    color: "rgb(11, 116, 229)",
+                                    width: "240px",
+                                    height: "38px",
+                                    borderRadius: "4px",
+                                    margin: "15px",
+                                }}
+                                disabled={
+                                    products?.data?.length >= products?.total
+                                }
+                                onClick={() => {
+                                    setLimit((prev) => prev + 5);
+                                }}
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
         </Loading>

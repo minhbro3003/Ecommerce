@@ -8,7 +8,7 @@ export const WrapperStyleImageSmall = styled.div`
 
 export const WrapperStyleNameProduct = styled.h1`
     color: rgb(36, 36, 36);
-    font-size: 30px;
+    font-size: 25px;
     font-weight: 500;
     line-height: 32px;
     word-break: break-word;
@@ -22,11 +22,11 @@ export const WrapperPriceProduct = styled.div`
 `;
 
 export const WrapperPriceTextProduct = styled.h1`
-    font-size: 32px;
+    font-size: 25px;
     line-height: 40px;
     margin-right: 8px;
-    font-weight: 500;
-    padding: 10px;
+    font-weight: 600;
+    padding: 0 10px;
     margin-top: 10px;
 `;
 
@@ -47,7 +47,7 @@ export const WrapperAddressProduct = styled.div`
         font-weight: 500;
     }
     border-block: 1px solid #e5e5e5;
-    padding: 10px;
+    padding: 10px 0;
 `;
 
 export const WrapperQualityProduct = styled.h2`
@@ -63,4 +63,10 @@ export const WrapperInputNumber = styled(InputNumber)`
     .ant-input-number.ant-input-number-sm {
         width: 30px;
     }
+`;
+
+export const WrapperDiscountPriceText = styled.span`
+    font-size: 12px;
+    background-color: #f5f5fa;
+    border-radius: 8px;
 `;

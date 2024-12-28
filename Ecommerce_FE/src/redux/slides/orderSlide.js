@@ -41,9 +41,19 @@ export const orderSlide = createSlice({
             const itemOrderSelected = state?.orderItemsSlected?.find(
                 (item) => item?.product === idProduct
             );
-            itemOrder.amount++;
-            if (itemOrderSelected) {
-                itemOrderSelected.amount++;
+            // itemOrder.amount++;
+            // if (itemOrderSelected) {
+            //     itemOrderSelected.amount++;
+            // }
+            if (itemOrder.amount < itemOrder.countInStock) {
+                // Kiểm tra giới hạn tồn kho
+                itemOrder.amount++;
+                if (
+                    itemOrderSelected &&
+                    itemOrderSelected.amount < itemOrder.countInStock
+                ) {
+                    itemOrderSelected.amount++;
+                }
             }
         },
         decreaseAmount: (state, action) => {
@@ -54,10 +64,17 @@ export const orderSlide = createSlice({
             const itemOrderSelected = state?.orderItemsSlected?.find(
                 (item) => item?.product === idProduct
             );
-            itemOrder.amount--;
-            // itemOrderSelected.amount--;
-            if (itemOrderSelected && itemOrderSelected.amount > 1) {
-                itemOrderSelected.amount--;
+            // itemOrder.amount--;
+            // // itemOrderSelected.amount--;
+            // if (itemOrderSelected && itemOrderSelected.amount > 1) {
+            //     itemOrderSelected.amount--;
+            // }
+            if (itemOrder.amount > 1) {
+                // Đảm bảo số lượng không dưới 1
+                itemOrder.amount--;
+                if (itemOrderSelected && itemOrderSelected.amount > 1) {
+                    itemOrderSelected.amount--;
+                }
             }
         },
         removeOrderProduct: (state, action) => {

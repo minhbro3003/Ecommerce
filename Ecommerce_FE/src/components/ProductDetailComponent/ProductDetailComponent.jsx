@@ -6,6 +6,7 @@ import imageproductSmall from "../../assets/images/test2.jpg";
 import {
     WrapperAddressProduct,
     WrapperBtQualityProduct,
+    WrapperDiscountPriceText,
     WrapperPriceProduct,
     WrapperPriceTextProduct,
     WrapperQualityProduct,
@@ -73,15 +74,6 @@ const ProductDetailComponent = ({ idProduct }) => {
         if (!user?.id) {
             navigate("/sign-in", { state: location?.pathname });
         } else {
-            // name: { type: String, required: true },
-            //     amount: { type: Number, required: true },
-            //     image: { type: String, required: true },
-            //     price: { type: Number, required: true },
-            //     product: {
-            //         type: mongoose.Schema.Types.ObjectId,
-            //         ref: "Product",
-            //         required: true,
-            //     },
             dispatch(
                 addOrderProduct({
                     orderItem: {
@@ -215,12 +207,60 @@ const ProductDetailComponent = ({ idProduct }) => {
                         <div>
                             {renderStars(productDetails?.rating)}
                             <WrapperStyleTextSell>
-                                | Đã bán {productDetails?.countInStock}+
+                                | Đã bán {productDetails?.selled}+
                             </WrapperStyleTextSell>
                         </div>
                         <WrapperPriceProduct>
                             <WrapperPriceTextProduct>
-                                {convertPrice(productDetails?.price)}
+                                {productDetails?.price ? (
+                                    <>
+                                        {convertPrice(
+                                            productDetails.price -
+                                                (productDetails.discount
+                                                    ? (productDetails.price *
+                                                          productDetails.discount) /
+                                                      100
+                                                    : 0)
+                                        )}
+                                        {productDetails?.discount > 0 && (
+                                            <>
+                                                <span
+                                                    style={{
+                                                        fontSize: "14px",
+                                                        backgroundColor:
+                                                            "#f5f5fa",
+                                                        borderRadius: "8px",
+                                                        color: "rgb(145 143 143)",
+                                                        marginLeft: "5px",
+                                                    }}
+                                                >
+                                                    {productDetails?.discount}%
+                                                </span>
+                                                <span
+                                                    style={{
+                                                        padding: "0 10px",
+                                                        color: "#808089",
+                                                        textDecorationLine:
+                                                            "line-through",
+                                                        fontSize: "16px",
+                                                    }}
+                                                >
+                                                    {convertPrice(
+                                                        productDetails.price
+                                                    )}
+                                                </span>
+                                            </>
+                                        )}
+                                    </>
+                                ) : (
+                                    // Hiển thị trạng thái tải dữ liệu
+                                    <>
+                                        <Loading
+                                            isLoading={isLoading}
+                                        ></Loading>
+                                        {productDetails?.price}
+                                    </>
+                                )}
                             </WrapperPriceTextProduct>
                         </WrapperPriceProduct>
                         <WrapperAddressProduct>
@@ -254,6 +294,7 @@ const ProductDetailComponent = ({ idProduct }) => {
                                     onClick={() =>
                                         handleChangeCount("decrease")
                                     }
+                                    disabled={numberProduct <= 1}
                                 >
                                     <MinusOutlined
                                         style={{
@@ -261,6 +302,10 @@ const ProductDetailComponent = ({ idProduct }) => {
                                             borderRadius: "4px",
                                             padding: "4px",
                                             fontSize: "25px",
+                                            backgroundColor:
+                                                numberProduct > 1
+                                                    ? "inherit"
+                                                    : "#d9d9d9",
                                         }}
                                     />
                                 </button>

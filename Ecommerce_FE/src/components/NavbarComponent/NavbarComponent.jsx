@@ -1,78 +1,38 @@
-import React from "react";
-import {
-    WrapperContent,
-    WrapperLableText,
-    WrapperPriceText,
-    WrapperTextValue,
-} from "./style";
-import { Checkbox, Rate } from "antd";
+import React, { useEffect, useState } from "react";
+import { WrapperContent, WrapperLableText } from "./style";
+import TypeProduct from "../TypeProduct/TypeProduct"; // Import component TypeProduct
+import * as ProductService from "../../services/ProductService";
 
 const NavbarComponent = () => {
-    const onChange = () => {};
-    const renderContent = (type, options) => {
-        switch (type) {
-            case "text":
-                return options?.map((option) => {
-                    return <WrapperTextValue>{option}</WrapperTextValue>;
-                });
-            case "checkbox":
-                return (
-                    <Checkbox.Group
-                        style={{
-                            width: "100%",
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "12px",
-                        }}
-                        onChange={onChange}
-                    >
-                        {options.map((option) => {
-                            return (
-                                <Checkbox value={option.value}>
-                                    {option.label}
-                                </Checkbox>
-                            );
-                        })}
-                    </Checkbox.Group>
-                );
-            case "star":
-                return options.map((option) => {
-                    // console.log("check", option);
-                    return (
-                        <div style={{ display: "flex", gap: "10px" }}>
-                            <Rate
-                                style={{ fontSize: "12px" }}
-                                disabled
-                                defaultValue={option}
-                            />
-                            <span>{`tu ${option} sao`}</span>
-                        </div>
-                    );
-                });
-            case "price":
-                return options.map((option) => {
-                    return <WrapperPriceText>{option}</WrapperPriceText>;
-                });
-            default:
-                return {};
+    const [typeProducts, setTypeProducts] = useState([]);
+    const fetchAllTypeProducts = async () => {
+        const res = await ProductService.getAllTypeProduct();
+        if (res?.status === "OK") {
+            setTypeProducts(res?.data || []);
+        } else {
+            console.error("Failed to fetch type products");
+            setTypeProducts([]);
         }
+        // console.log("res  type: ", res);
     };
+    useEffect(() => {
+        fetchAllTypeProducts();
+    }, []);
+
     return (
         <div>
-            <WrapperLableText>Lable</WrapperLableText>
+            <WrapperLableText>Danh mục sản phẩm</WrapperLableText>
             <WrapperContent>
-                {renderContent("text", ["Tu lanh", "TV", "Iphone"])}
+                <>
+                    {typeProducts.length > 0 ? (
+                        typeProducts?.map((item, index) => (
+                            <TypeProduct name={item} key={index} />
+                        ))
+                    ) : (
+                        <div>No product types available</div> // Trường hợp không có dữ liệu
+                    )}
+                </>
             </WrapperContent>
-            {/* <WrapperContent>
-                {renderContent("checkbox", [
-                    { value: "a", label: "A" },
-                    { value: "b", label: "B" },
-                ])}
-            </WrapperContent>
-            <WrapperContent>{renderContent("star", [3, 4, 5])}</WrapperContent>
-            <WrapperContent>
-                {renderContent("price", ["duoi 40", "40-100", "tren 100"])}
-            </WrapperContent> */}
         </div>
     );
 };

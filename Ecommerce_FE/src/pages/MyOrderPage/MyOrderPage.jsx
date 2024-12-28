@@ -65,6 +65,7 @@ const MyOrderPage = () => {
     });
 
     const handleCancelOrder = (order) => {
+        console.log("Order data:", order);
         if (!order?._id) {
             message.error("Invalid Order ID. Unable to cancel order.");
             return;
@@ -124,7 +125,7 @@ const MyOrderPage = () => {
                                                 {item.name}
                                             </ProductName>
                                             <ProductPrice>
-                                                {convertPrice(item.price)}
+                                                {convertPrice(item.price)} VND
                                             </ProductPrice>
                                         </ProductItem>
                                     ))}
@@ -136,20 +137,18 @@ const MyOrderPage = () => {
                                 </TotalAmount>
                                 <ActionButtons>
                                     <ButtonComponent
-                                        textbutton="Hủy đơn hàng"
+                                        textButton="Hủy đơn hàng"
                                         styleButton={{
                                             backgroundColor: "#ff4d4f",
                                             color: "black",
                                         }}
-                                        onClick={() =>
-                                            handleCancelOrder(order._id)
-                                        }
+                                        onClick={() => handleCancelOrder(order)}
                                     />
                                     <ButtonComponent
-                                        textbutton="Xem chi tiết"
+                                        textButton="Xem chi tiết"
                                         styleButton={{
                                             backgroundColor: "#1890ff",
-                                            color: "white",
+                                            color: "black",
                                         }}
                                         onClick={() =>
                                             handleDetailsOrder(order._id)

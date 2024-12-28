@@ -9,7 +9,6 @@ import { StarFilled } from "@ant-design/icons";
 import Loading from "../../components/LoadingComponent/Loading";
 import { useSelector } from "react-redux";
 import { useDebounce } from "../../hooks/useDebounce";
-import { convertPrice } from "../../utils";
 
 const TypeProductPage = () => {
     const { state } = useLocation();
@@ -97,7 +96,7 @@ const TypeProductPage = () => {
                                             description={p.description}
                                             image={p.image}
                                             name={p.name}
-                                            price={convertPrice(p.price)}
+                                            price={p?.price}
                                             rating={renderStars(p?.rating)}
                                             type={p.type}
                                             discount={p.discount}

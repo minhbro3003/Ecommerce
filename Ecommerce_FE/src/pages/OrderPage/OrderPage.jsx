@@ -41,9 +41,10 @@ const OrderPage = () => {
         price: item.price,
         discount: item.discount,
         quantity: item.amount,
+        countInStock: item.countInStock,
         total: item.amount * item.price * (1 - item.discount / 100),
     }));
-    console.log("order: ", order);
+    console.log("cartData: ", order);
 
     useEffect(() => {
         if (isOpenModalUpdateInfo) {
@@ -189,9 +190,9 @@ const OrderPage = () => {
                     />
                 </>
             ),
-            width: "21%",
+            // width: "21%",
         },
-        { title: "Tên sản phẩm", dataIndex: "name", width: "25%" },
+        { title: "Tên sản phẩm", dataIndex: "name", width: "22%" },
         {
             title: "Đơn giá",
             dataIndex: "price",
@@ -200,19 +201,36 @@ const OrderPage = () => {
                     record.price * (1 - record.discount / 100); // Tính giá sau giảm
                 return (
                     <>
-                        <span
-                            style={{
-                                textDecoration: "line-through",
-                                marginRight: 8,
-                                color: "#b8b8b8",
-                            }}
-                        >
-                            {convertPrice(record.price)}
+                        <span>
+                            {record.discount > 0 ? (
+                                <>
+                                    <span
+                                        style={{
+                                            textDecoration: "line-through",
+                                            marginRight: 8,
+                                            color: "#b8b8b8",
+                                        }}
+                                    >
+                                        {convertPrice(record.price)}
+                                    </span>
+                                    <span>{convertPrice(discountPrice)}</span>
+                                    <span
+                                        style={{
+                                            marginLeft: 3,
+                                            color: "green",
+                                        }}
+                                    >
+                                        ({record.discount}%)
+                                    </span>
+                                </>
+                            ) : (
+                                <span>{convertPrice(record.price)}</span>
+                            )}
                         </span>
-                        <span>{convertPrice(discountPrice)}</span>
                     </>
                 );
             },
+            width: "24%",
         },
 
         {
@@ -244,6 +262,7 @@ const OrderPage = () => {
                     </span>
                     <Button
                         size="small"
+                        disabled={record.quantity >= record.countInStock}
                         onClick={() => handleQuantityChange(record, 1)}
                     >
                         <PlusOutlined />
@@ -282,35 +301,32 @@ const OrderPage = () => {
     ];
 
     const priceMemo = useMemo(() => {
-        const result = order?.orderItemsSlected?.reduce((total, cur) => {
-            return total + cur.price * cur.amount * (1 - cur.discount / 100);
+        return order?.orderItemsSlected?.reduce((total, cur) => {
+            return total + cur.amount * cur.price; // Tổng giá chưa giảm
         }, 0);
-        return result;
     }, [order]);
 
     const priceDiscountMemo = useMemo(() => {
-        const result = order?.orderItemsSlected?.reduce((total, cur) => {
-            return total + cur.discount * cur.amount;
+        return order?.orderItemsSlected?.reduce((total, cur) => {
+            const discountRate = cur.discount || 0;
+            return total + cur.amount * cur.price * (discountRate / 100); // Tổng tiền giảm giá
         }, 0);
-        if (Number(result)) {
-            return result;
-        }
-        return 0;
     }, [order]);
 
     const diliveryPriceMemo = useMemo(() => {
-        return priceMemo === 0
+        const totalAfterDiscount = priceMemo - priceDiscountMemo;
+        return totalAfterDiscount === 0
             ? 0
-            : priceMemo >= 500000
+            : totalAfterDiscount >= 500000
             ? 0
-            : priceMemo > 200000
+            : totalAfterDiscount > 200000
             ? 10000
             : 20000;
-    }, [priceMemo]);
+    }, [priceMemo, priceDiscountMemo]);
 
     const totalPriceMemo = useMemo(() => {
-        return priceMemo + diliveryPriceMemo;
-    }, [priceMemo, diliveryPriceMemo]);
+        return priceMemo - priceDiscountMemo + diliveryPriceMemo; // Tổng tiền cuối cùng
+    }, [priceMemo, priceDiscountMemo, diliveryPriceMemo]);
 
     const totalSummary = useMemo(() => {
         return cartData
@@ -411,7 +427,7 @@ const OrderPage = () => {
                     <hr />
                     <p>Tạm tính tien: {convertPrice(priceMemo)} VND</p>
                     {/* <p>Tạm tính: {convertPrice(summary.subTotal)} VND</p> */}
-                    <p>Giảm giá tien: {priceDiscountMemo} %</p>
+                    <p>Giảm giá tien: {convertPrice(priceDiscountMemo)} VND</p>
                     {/* <p>Giảm giá: {convertPrice(summary.discount)} VND</p> */}
                     <p>Thuế: 0</p>
                     <p>Phí giao hàng: {convertPrice(diliveryPriceMemo)} VND</p>

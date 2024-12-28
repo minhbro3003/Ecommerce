@@ -40,7 +40,7 @@ const DetailsOrderPage = () => {
 
     const priceMemo = useMemo(() => {
         const result = data?.orderItems?.reduce((total, cur) => {
-            return total + cur.price * cur.amount;
+            return total + cur.price * cur.amount * (1 - cur.discount / 100);
         }, 0);
         return result;
     }, [data]);
@@ -122,8 +122,9 @@ const DetailsOrderPage = () => {
                             <WrapperItemLabel>Giảm giá</WrapperItemLabel>
                         </div>
                         {data?.orderItems?.map((order) => {
+                            console.log("order data", order);
                             return (
-                                <WrapperProduct>
+                                <WrapperProduct key={order._id}>
                                     <WrapperNameProduct>
                                         <img
                                             src={order?.image}
@@ -156,11 +157,12 @@ const DetailsOrderPage = () => {
                                     <WrapperItem>
                                         {order?.discount
                                             ? convertPrice(
-                                                  (priceMemo *
+                                                  (order?.price *
                                                       order?.discount) /
                                                       100
                                               )
-                                            : "0 VND"}
+                                            : "0 "}
+                                        VND
                                     </WrapperItem>
                                 </WrapperProduct>
                             );

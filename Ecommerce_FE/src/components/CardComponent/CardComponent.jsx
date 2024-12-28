@@ -6,20 +6,21 @@ import {
     WrapperPriceText,
     WrapperReportText,
     WrapperStyleTextSell,
+    WrapperTextPrice,
 } from "./style";
-import logo from "../../assets/images/image.png";
+// import logo from "../../assets/images/image.png";
 import { useNavigate } from "react-router";
 import { convertPrice } from "../../utils";
 
 const CardComponent = (props) => {
     const {
-        countInStock,
-        description,
+        // countInStock,
+        // description,
         image,
         name,
         price,
         rating,
-        type,
+        // type,
         discount,
         selled,
         id,
@@ -42,7 +43,7 @@ const CardComponent = (props) => {
                 />
             }
         >
-            <img
+            {/* <img
                 alt="logo"
                 src={logo}
                 style={{
@@ -53,8 +54,11 @@ const CardComponent = (props) => {
                     left: 1,
                     borderTopLeftRadius: "3px",
                 }}
-            />
-            <StyleNameProduct>{name}</StyleNameProduct>
+            /> */}
+            <StyleNameProduct>
+                {name.length > 38 ? `${name.slice(0, 38)}...` : name}
+            </StyleNameProduct>
+
             <WrapperReportText>
                 <span style={{ marginRight: "4px" }}>
                     <span>{rating}</span>{" "}
@@ -62,15 +66,24 @@ const CardComponent = (props) => {
 
                 <WrapperStyleTextSell>| Đã bán {selled}</WrapperStyleTextSell>
             </WrapperReportText>
+            {/* {"nếu có discount mới hiện - ngược lạilại"} */}
             <WrapperPriceText>
                 <span style={{ marginRight: "8px" }}>
-                    {/* {price.toLocaleString()} */}
-                    {convertPrice(price)}
+                    {discount > 0
+                        ? convertPrice(price - (price * discount) / 100) // Giá đã giảm
+                        : convertPrice(price)}{" "}
                 </span>
+            </WrapperPriceText>
+
+            {discount > 0 && (
                 <WrapperDiscountPriceText>
                     - {discount}%
                 </WrapperDiscountPriceText>
-            </WrapperPriceText>
+            )}
+
+            {discount > 0 && (
+                <WrapperTextPrice>{convertPrice(price)}</WrapperTextPrice>
+            )}
         </WrapperCardStyple>
     );
 };
