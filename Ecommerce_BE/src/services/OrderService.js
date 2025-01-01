@@ -1,5 +1,6 @@
 const Order = require("../models/OrderProductModel");
 const Product = require("../models/ProductModel");
+const EmailService = require("../services/EmailService");
 
 // const createOrder = (newOrder) => {
 //     return new Promise(async (resolve, reject) => {
@@ -151,10 +152,9 @@ const createOrder = (newOrder) => {
                 isPaid,
                 paidAt,
             });
-
             if (createdOrder) {
                 // Gửi email xác nhận nếu cần
-                // await EmailService.sendEmailCreateOrder(email, orderItems);
+                await EmailService.sendEmailCreateOrder(email, orderItems);
                 resolve({
                     status: "OK",
                     message: "Tạo đơn hàng thành công!",

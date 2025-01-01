@@ -17,7 +17,8 @@ const createOrder = async (req, res) => {
         if (
             !paymentMethod ||
             !itemsPrice ||
-            !shippingPrice ||
+            shippingPrice === undefined ||
+            shippingPrice === null ||
             !totalPrice ||
             !fullName ||
             !address ||
@@ -25,9 +26,10 @@ const createOrder = async (req, res) => {
             !phone ||
             !orderItems.length
         ) {
-            return res
-                .status(400)
-                .json({ status: "ERR", message: "The input is required." });
+            return res.status(400).json({
+                status: "ERR",
+                message: "The input is required create order.",
+            });
         }
 
         const product = await OrderService.createOrder(req.body);

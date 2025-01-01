@@ -29,6 +29,7 @@ mongoose
     .catch((err) => {
         console.error("Error connecting to MongoDB   - ", err);
     });
+// console.log("process.env.PAYPAL_CLIENT_ID: ", process.env.PAYPAL_CLIENT_ID);
 
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
