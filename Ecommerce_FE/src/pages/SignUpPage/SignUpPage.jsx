@@ -32,10 +32,10 @@ const SignUpPage = () => {
 
     useEffect(() => {
         if (isSuccess) {
-            message.success();
+            message.success("Tạo tài khoản thành công!");
             handleNavigateSignIn();
         } else if (isError) {
-            message.error();
+            message.error("Tạo tài khoản thất bại!");
         }
     }, [isSuccess, isError]);
     // useEffect(() => {

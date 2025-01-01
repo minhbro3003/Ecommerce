@@ -24,10 +24,19 @@ export const orderSlide = createSlice({
         addOrderProduct: (state, action) => {
             console.log({ state, action });
             const { orderItem } = action.payload;
+            if (orderItem.countInStock <= 0) {
+                return; // Không thêm sản phẩm vào giỏ hàng
+            }
             const itemOrder = state?.orderItems?.find(
                 (item) => item?.product === orderItem.product
             );
             if (itemOrder) {
+                if (
+                    itemOrder.amount + orderItem.amount >
+                    itemOrder.countInStock
+                ) {
+                    return; // Không tăng số lượng vượt quá tồn kho
+                }
                 itemOrder.amount += orderItem?.amount;
             } else {
                 state.orderItems.push(orderItem);

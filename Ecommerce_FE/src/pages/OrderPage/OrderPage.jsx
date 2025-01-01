@@ -163,7 +163,7 @@ const OrderPage = () => {
         }
         // console.log("stataUpdateInfo", stateUserDetails);
     };
-    console.log("data: ", data);
+    // console.log("data: ", data);
 
     const columns = [
         {
@@ -190,9 +190,15 @@ const OrderPage = () => {
                     />
                 </>
             ),
-            // width: "21%",
+            width: "21%",
         },
-        { title: "Tên sản phẩm", dataIndex: "name", width: "22%" },
+        {
+            title: "Tên sản phẩm",
+            dataIndex: "name",
+            width: "22%",
+            render: (text) =>
+                text.length > 38 ? `${text.slice(0, 38)}...` : text,
+        },
         {
             title: "Đơn giá",
             dataIndex: "price",
@@ -276,6 +282,7 @@ const OrderPage = () => {
             render: (total) => (
                 <span style={{ color: "red" }}>{convertPrice(total)}</span>
             ),
+            width: "12%",
         },
         {
             title: (
@@ -440,21 +447,23 @@ const OrderPage = () => {
                             {/* {convertPrice(summary.total)} VND */}
                         </span>
                     </h3>
-                    <Tooltip title="Vui lòng chọn sản phẩm trước khi mua!">
-                        <Button
-                            style={{
-                                width: "100%",
-                                backgroundColor: "red",
-                                color: "white",
-                                borderColor: "red",
-                                marginTop: "20px",
-                            }}
-                            onClick={() => handleAddCard()}
-                            disabled={listChecked.length === 0}
-                        >
-                            Mua hàng
-                        </Button>
-                    </Tooltip>
+                    {/* <Tooltip title="Vui lòng chọn sản phẩm trước khi mua!"> */}
+                    <Button
+                        style={{
+                            width: "100%",
+                            height: "45px",
+                            backgroundColor:
+                                listChecked.length === 0 ? "#d9d9d9" : "red",
+                            color: listChecked.length === 0 ? "gray" : "white",
+                            // borderColor: "red",
+                            marginTop: "20px",
+                        }}
+                        onClick={() => handleAddCard()}
+                        disabled={listChecked.length === 0}
+                    >
+                        Mua hàng
+                    </Button>
+                    {/* </Tooltip> */}
                 </Card>
             </div>
             <ModalComponent

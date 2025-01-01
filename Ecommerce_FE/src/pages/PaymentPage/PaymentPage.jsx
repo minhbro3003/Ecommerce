@@ -22,7 +22,7 @@ import * as message from "../../components/Message/Message";
 import { updateUser } from "../../redux/slides/useSlide";
 import { useNavigate } from "react-router-dom";
 import { removeAllOrderProduct } from "../../redux/slides/orderSlide";
-// import { PayPalButton } from "react-paypal-button-v2";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import * as PaymentService from "../../services/PaymentService";
 
 const PaymentPage = () => {
@@ -33,6 +33,7 @@ const PaymentPage = () => {
     const [payment, setPayment] = useState("later_money");
     const navigate = useNavigate();
     const [sdkReady, setSdkReady] = useState(false);
+    const [clientId, setClientId] = useState(null); // lưu client-id
 
     const [isOpenModalUpdateInfo, setIsOpenModalUpdateInfo] = useState(false);
     const [stateUserDetails, setStateUserDetails] = useState({
@@ -66,25 +67,38 @@ const PaymentPage = () => {
 
     const priceMemo = useMemo(() => {
         const result = order?.orderItemsSlected?.reduce((total, cur) => {
-            return total + cur.price * cur.amount * (1 - cur.discount / 100);
+            return total + cur.price * cur.amount;
         }, 0);
         return result;
     }, [order]);
 
     const priceDiscountMemo = useMemo(() => {
         const result = order?.orderItemsSlected?.reduce((total, cur) => {
-            return total + cur.price * cur.amount * (cur.discount / 100);
+            const discountRate = cur.discount || 0;
+            return total + cur.amount * cur.price * (discountRate / 100);
         }, 0);
         return result || 0; // Trả về 0 nếu không có kết quả hợp lệ
     }, [order]);
 
+    // const diliveryPriceMemo = useMemo(() => {
+    //     return priceMemo > 10000000 ? 10000 : priceMemo === 0 ? 0 : 20000;
+    // }, [priceMemo]);
     const diliveryPriceMemo = useMemo(() => {
-        return priceMemo > 10000000 ? 10000 : priceMemo === 0 ? 0 : 20000;
+        return priceMemo === 0
+            ? 0
+            : priceMemo >= 500000
+            ? 0
+            : priceMemo > 200000
+            ? 10000
+            : 20000;
     }, [priceMemo]);
 
+    console.log("priceMemo:", priceMemo);
+    console.log("diliveryPriceMemo:", diliveryPriceMemo);
+
     const totalPriceMemo = useMemo(() => {
-        return Number(priceMemo) + Number(diliveryPriceMemo);
-    }, [priceMemo, diliveryPriceMemo]);
+        return priceMemo - priceDiscountMemo + diliveryPriceMemo;
+    }, [priceMemo, diliveryPriceMemo, priceDiscountMemo]);
 
     const handleAddOrder = () => {
         if (
@@ -114,7 +128,7 @@ const PaymentPage = () => {
             });
         }
     };
-    console.log("order: ", order, user);
+    // console.log("order: ", order, user);
 
     const mutationUpdate = useMutationHooks((data) => {
         const { id, token, ...rests } = data;
@@ -123,7 +137,7 @@ const PaymentPage = () => {
     });
 
     const mutationAddOrder = useMutationHooks((data) => {
-        console.log("Data gửi tới API:", data);
+        // console.log("Data gửi tới API:", data);
         const { token, ...rests } = data;
         const res = OrderService.createOrder({ ...rests }, token);
         return res;
@@ -140,6 +154,7 @@ const PaymentPage = () => {
     useEffect(() => {
         console.log("isSuccess:", isSuccess, "dataAdd:", dataAdd);
         if (isSuccess && dataAdd?.status === "OK") {
+            console.log("Data is successful, processing order...");
             const arrayOrdered = [];
             order?.orderItemsSlected?.forEach((element) => {
                 arrayOrdered.push(element.product);
@@ -155,6 +170,7 @@ const PaymentPage = () => {
                 },
             });
         } else if (isError) {
+            console.log("Order failed:", dataAdd);
             message.error("Đặt hàng thất bại");
         }
     }, [isSuccess, isError]);
@@ -170,7 +186,16 @@ const PaymentPage = () => {
         setIsOpenModalUpdateInfo(false);
     };
 
-    const onSuccessPaypal = (details, data) => {
+    const onSuccessPaypal = (data, actions) => {
+        if (!data || !actions) {
+            console.error("Error: Missing data or actions in PayPal response.");
+            return;
+        }
+
+        console.log("Data received from PayPal: ", data);
+        console.log("Actions available for PayPal: ", actions);
+
+        // Gửi dữ liệu thanh toán đã thành công vào hệ thống
         mutationAddOrder.mutate({
             token: user?.access_token,
             orderItems: order?.orderItemsSlected,
@@ -184,9 +209,18 @@ const PaymentPage = () => {
             totalPrice: totalPriceMemo,
             user: user?.id,
             isPaid: true,
-            paidAt: details.update_time,
+            paidAt: actions.update_time, // Ensure this property exists
             email: user?.email,
         });
+
+        if (mutationAddOrder.isSuccess) {
+            dispatch({
+                payload: {
+                    status: "OK",
+                    details: data, // Dữ liệu thanh toán từ PayPal
+                },
+            });
+        }
     };
 
     const handleUpdateInforUser = () => {
@@ -236,20 +270,36 @@ const PaymentPage = () => {
 
     const addPaypalScript = async () => {
         const { data } = await PaymentService.getConfig();
+        setClientId(data);
+
+        if (!document.body) {
+            console.error(
+                "document.body is not available, unable to append PayPal script."
+            );
+            return;
+        }
+
         const script = document.createElement("script");
         script.type = "text/javascript";
         script.src = `https://www.paypal.com/sdk/js?client-id=${data}`;
         script.async = true;
         script.onload = () => {
+            console.log("PayPal SDK loaded.");
             setSdkReady(true);
         };
+        script.onerror = (error) => {
+            console.error("Error loading PayPal SDK script: ", error);
+        };
+
         document.body.appendChild(script);
     };
 
     useEffect(() => {
         if (!window.paypal) {
+            console.log("PayPal SDK chưa được tải, đang tải...");
             addPaypalScript();
         } else {
+            console.log("PayPal SDK đã tải thành công.");
             setSdkReady(true);
         }
     }, []);
@@ -429,14 +479,47 @@ const PaymentPage = () => {
                         </div>
                         {payment === "paypal" && sdkReady ? (
                             <div style={{ width: "320px" }}>
-                                {/* <PayPalButton
-                    amount={Math.round(totalPriceMemo / 30000)}
-                    // shippingPreference="NO_SHIPPING" // default is "GET_FROM_FILE"
-                    onSuccess={onSuccessPaypal}
-                    onError={() => {
-                      alert('Erroe')
-                    }}
-                  /> */}
+                                <PayPalScriptProvider
+                                    options={{
+                                        "client-id": clientId, // client-id lấy từ backend
+                                        currency: "USD", // Hoặc loại tiền bạn muốn (có thể thay đổi thành VND nếu muốn)
+                                    }}
+                                >
+                                    <PayPalButtons
+                                        createOrder={(data, actions) => {
+                                            if (!actions || !actions.order) {
+                                                console.error(
+                                                    "Error: No order action available."
+                                                );
+                                                return;
+                                            }
+                                            const exchangeRateVNDToUSD = 23000; // Ví dụ: 1 USD = 23,000 VND
+                                            const totalPriceInUSD = (
+                                                totalPriceMemo /
+                                                exchangeRateVNDToUSD
+                                            ).toFixed(2); // Đổi sang USD
+                                            return actions.order
+                                                .create({
+                                                    purchase_units: [
+                                                        {
+                                                            amount: {
+                                                                value: totalPriceInUSD.toString(), // Sử dụng totalPriceMemo để thanh toán đúng
+                                                            },
+                                                        },
+                                                    ],
+                                                })
+                                                .catch((error) => {
+                                                    console.error(
+                                                        "Error creating the order:",
+                                                        error
+                                                    );
+                                                });
+                                        }}
+                                        onApprove={(data, actions) => {
+                                            onSuccessPaypal(data, actions);
+                                        }}
+                                    />
+                                </PayPalScriptProvider>
                             </div>
                         ) : (
                             <Button

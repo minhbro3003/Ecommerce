@@ -1,12 +1,10 @@
 import { Col, Row, Image, Input } from "antd";
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import imageproduct from "../../assets/images/test1.jpeg";
 import imageproductSmall from "../../assets/images/test2.jpg";
 import {
     WrapperAddressProduct,
     WrapperBtQualityProduct,
-    WrapperDiscountPriceText,
     WrapperPriceProduct,
     WrapperPriceTextProduct,
     WrapperQualityProduct,
@@ -21,6 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router";
 import { addOrderProduct } from "../../redux/slides/orderSlide";
 import { convertPrice } from "../../utils";
+import * as message from "../../components/Message/Message";
 
 const ProductDetailComponent = ({ idProduct }) => {
     const [numberProduct, setNumberProduct] = useState(1);
@@ -73,6 +72,9 @@ const ProductDetailComponent = ({ idProduct }) => {
     const handleAddOrderProduct = () => {
         if (!user?.id) {
             navigate("/sign-in", { state: location?.pathname });
+        } else if (productDetails?.countInStock < 1) {
+            // Sản phẩm hết hàng
+            message.error("Sản phẩm đã hết hàng, không thể thêm vào giỏ.");
         } else {
             dispatch(
                 addOrderProduct({
@@ -87,6 +89,7 @@ const ProductDetailComponent = ({ idProduct }) => {
                     },
                 })
             );
+            message.success("Thêm sản phẩm vào giỏ hàng thành công!");
         }
     };
     console.log("productDetails", productDetails, user);
@@ -332,6 +335,10 @@ const ProductDetailComponent = ({ idProduct }) => {
                                     onClick={() =>
                                         handleChangeCount("increase")
                                     }
+                                    disabled={
+                                        numberProduct >=
+                                        productDetails?.countInStock
+                                    }
                                 >
                                     <PlusOutlined
                                         style={{
@@ -339,6 +346,11 @@ const ProductDetailComponent = ({ idProduct }) => {
                                             borderRadius: "4px",
                                             padding: "4px",
                                             fontSize: "25px",
+                                            backgroundColor:
+                                                numberProduct >=
+                                                productDetails?.countInStock
+                                                    ? "#d9d9d9"
+                                                    : "inherit",
                                         }}
                                     />
                                 </button>
@@ -347,15 +359,31 @@ const ProductDetailComponent = ({ idProduct }) => {
                                 <ButtonComponent
                                     size={40}
                                     style={{
-                                        background: "rgb(255, 66, 78)",
-                                        color: "white",
+                                        background:
+                                            productDetails?.countInStock < 1
+                                                ? "#d9d9d9"
+                                                : "rgb(255, 66, 78)",
+                                        color:
+                                            productDetails?.countInStock < 1
+                                                ? "gray"
+                                                : "white",
                                         marginTop: "20px",
                                         width: "200px",
                                         height: "48px",
+                                        cursor:
+                                            productDetails?.countInStock < 1
+                                                ? "not-allowed"
+                                                : "pointer",
                                     }}
                                     onClick={handleAddOrderProduct}
-                                    textButton="Chọn mua"
-                                ></ButtonComponent>
+                                    textButton={
+                                        productDetails?.countInStock < 1
+                                            ? "Hết hàng"
+                                            : "Chọn mua"
+                                    }
+                                    disabled={productDetails?.countInStock < 1}
+                                />
+
                                 <ButtonComponent
                                     size={40}
                                     style={{

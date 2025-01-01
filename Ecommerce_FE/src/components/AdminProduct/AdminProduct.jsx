@@ -521,6 +521,8 @@ const AdminProduct = () => {
         {
             title: "Name",
             dataIndex: "name",
+            render: (text) =>
+                text.length > 38 ? `${text.slice(0, 38)}...` : text,
             // render: (text) => <a>{text}</a>,
             sorter: (a, b) => a.name.length - b.name.length,
             ...getColumnSearchProps("name"),

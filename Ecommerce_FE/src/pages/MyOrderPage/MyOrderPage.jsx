@@ -122,7 +122,11 @@ const MyOrderPage = () => {
                                                 alt={item.name}
                                             />
                                             <ProductName>
-                                                {item.name}
+                                                {/* {item.name} */}
+                                                {item.name.length > 38
+                                                    ? item.name.slice(0, 38) +
+                                                      "..."
+                                                    : item.name}
                                             </ProductName>
                                             <ProductPrice>
                                                 {convertPrice(item.price)} VND

@@ -69,8 +69,11 @@ const DetailsOrderPage = () => {
                                 <div className="name-info">
                                     {data?.shippingAddress?.fullName}
                                 </div>
-                                <div className="address-info">
-                                    <span>Địa chỉ: </span>{" "}
+                                <div
+                                    style={{ marginTop: "8px" }}
+                                    className="address-info"
+                                >
+                                    <span>Địa chỉ: </span>
                                     {`${data?.shippingAddress?.address} ${data?.shippingAddress?.city}`}
                                 </div>
                                 <div className="phone-info">

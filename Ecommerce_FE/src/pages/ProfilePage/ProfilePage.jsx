@@ -121,7 +121,7 @@ const ProfilePage = () => {
                     <WrapperLable htmlFor="email">Email</WrapperLable>
                     <InputFormComponent
                         style={{ width: "300px" }}
-                        placeholder="Họ và tên"
+                        placeholder="Nhậtp email.."
                         id="email"
                         value={email}
                         onChange={handleOnChangeEmail}
@@ -143,7 +143,7 @@ const ProfilePage = () => {
                     <WrapperLable htmlFor="phone">Phone:</WrapperLable>
                     <InputFormComponent
                         style={{ width: "300px" }}
-                        placeholder="Họ và tên"
+                        placeholder="Nhận số điện thoại.."
                         id="phone"
                         value={phone}
                         onChange={handleOnChangePhone}
@@ -165,7 +165,7 @@ const ProfilePage = () => {
                     <WrapperLable htmlFor="address">Address:</WrapperLable>
                     <InputFormComponent
                         style={{ width: "300px" }}
-                        placeholder="Họ và tên"
+                        placeholder="Nhập địa chỉ.."
                         id="address"
                         value={address}
                         onChange={handleOnChangeAddress}
