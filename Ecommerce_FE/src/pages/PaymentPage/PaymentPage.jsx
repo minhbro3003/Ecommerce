@@ -93,8 +93,8 @@ const PaymentPage = () => {
             : 20000;
     }, [priceMemo]);
 
-    console.log("priceMemo:", priceMemo);
-    console.log("diliveryPriceMemo:", diliveryPriceMemo);
+    // console.log("priceMemo:", priceMemo);
+    // console.log("diliveryPriceMemo:", diliveryPriceMemo);
 
     const totalPriceMemo = useMemo(() => {
         return priceMemo - priceDiscountMemo + diliveryPriceMemo;
@@ -152,9 +152,9 @@ const PaymentPage = () => {
     } = mutationAddOrder;
 
     useEffect(() => {
-        console.log("isSuccess:", isSuccess, "dataAdd:", dataAdd);
+        // console.log("isSuccess:", isSuccess, "dataAdd:", dataAdd);
         if (isSuccess && dataAdd?.status === "OK") {
-            console.log("Data is successful, processing order...");
+            // console.log("Data is successful, processing order...");
             const arrayOrdered = [];
             order?.orderItemsSlected?.forEach((element) => {
                 arrayOrdered.push(element.product);
@@ -170,7 +170,7 @@ const PaymentPage = () => {
                 },
             });
         } else if (isError) {
-            console.log("Order failed:", dataAdd);
+            // console.log("Order failed:", dataAdd);
             message.error("Đặt hàng thất bại");
         }
     }, [isSuccess, isError]);

@@ -29,7 +29,8 @@ const CardComponent = (props) => {
     const navigate = useNavigate();
     const handleDetailsProduct = (id) => {
         navigate(`/product-details/${id}`);
-        console.log("Product ID:", id);
+        // console.log("Product ID:", id);
+        window.location.reload();
     };
 
     return (
@@ -64,7 +65,7 @@ const CardComponent = (props) => {
                     <span>{rating}</span>{" "}
                 </span>
 
-                <WrapperStyleTextSell>| Đã bán {selled}</WrapperStyleTextSell>
+                <WrapperStyleTextSell> Đã bán {selled}</WrapperStyleTextSell>
             </WrapperReportText>
             {/* {"nếu có discount mới hiện - ngược lạilại"} */}
             <WrapperPriceText>

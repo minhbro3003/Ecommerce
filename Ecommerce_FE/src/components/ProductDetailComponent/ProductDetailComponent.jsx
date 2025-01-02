@@ -1,5 +1,5 @@
 import { Col, Row, Image, Input } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import imageproductSmall from "../../assets/images/test2.jpg";
 import {
@@ -18,8 +18,10 @@ import Loading from "../../components/LoadingComponent/Loading";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router";
 import { addOrderProduct } from "../../redux/slides/orderSlide";
-import { convertPrice } from "../../utils";
+import { convertPrice, initFacebookSDK } from "../../utils";
 import * as message from "../../components/Message/Message";
+import LikeButtonComponent from "../LikeButtonComponent/LikeButtonComponent";
+import CommentComponent from "../CommentComponent/CommentComponent";
 
 const ProductDetailComponent = ({ idProduct }) => {
     const [numberProduct, setNumberProduct] = useState(1);
@@ -52,12 +54,21 @@ const ProductDetailComponent = ({ idProduct }) => {
         return res.data;
     };
 
+    useEffect(() => {
+        initFacebookSDK().then(() => {
+            // Chỉ gọi parse sau khi SDK đã sẵn sàng
+            if (window.FB) {
+                window.FB.XFBML.parse();
+            }
+        });
+    }, []);
+
     const { isLoading, data: productDetails } = useQuery({
         queryKey: ["product-details", idProduct],
         queryFn: fetchGetDetailsProduct,
         enabled: !!idProduct,
     });
-    console.log("product details", productDetails);
+    // console.log("product details", productDetails);
 
     const renderStars = (num) => {
         const stars = [];
@@ -210,7 +221,9 @@ const ProductDetailComponent = ({ idProduct }) => {
                         <div>
                             {renderStars(productDetails?.rating)}
                             <WrapperStyleTextSell>
-                                | Đã bán {productDetails?.selled}+
+                                {" "}
+                                Đã bán: {productDetails?.selled} | Kho:{" "}
+                                {productDetails?.countInStock}
                             </WrapperStyleTextSell>
                         </div>
                         <WrapperPriceProduct>
@@ -285,6 +298,11 @@ const ProductDetailComponent = ({ idProduct }) => {
                             -
                             <span className="change-address"> Đổi địa chỉ</span>
                         </WrapperAddressProduct>
+                        <LikeButtonComponent
+                            dataHref={
+                                "https://developers.facebook.com/docs/plugins/"
+                            }
+                        />
                         <WrapperQualityProduct>
                             <div>Số lượng</div>
                             <WrapperBtQualityProduct>
@@ -399,6 +417,12 @@ const ProductDetailComponent = ({ idProduct }) => {
                             </div>
                         </WrapperQualityProduct>
                     </Col>
+                    <CommentComponent
+                        dataHref={
+                            "https://developers.facebook.com/docs/plugins/comments#configurator"
+                        }
+                        width="1270"
+                    />
                 </Row>
             </div>
         </Loading>

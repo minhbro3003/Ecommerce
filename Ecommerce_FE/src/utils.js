@@ -40,3 +40,33 @@ export const convertPrice = (price) => {
         return null;
     }
 };
+
+export const initFacebookSDK = () => {
+    const locale = "vi_VN";
+
+    return new Promise((resolve) => {
+        // Load the Facebook SDK asynchronously
+        (function (d, s, id) {
+            let js,
+                fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = `https://connect.facebook.net/${locale}/sdk.js`;
+            fjs.parentNode.insertBefore(js, fjs);
+        })(document, "script", "facebook-jssdk");
+
+        // Initialize SDK once it's loaded
+        window.fbAsyncInit = function () {
+            window.FB.init({
+                appId: process.env.REACT_APP_FB_ID, // Replace with your app ID
+                cookie: true,
+                xfbml: true,
+                version: "v17.0",
+            });
+
+            console.log("Facebook SDK initialized");
+            resolve();
+        };
+    });
+};
