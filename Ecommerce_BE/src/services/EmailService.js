@@ -87,7 +87,7 @@ const sendEmailCreateOrder = async (email, orderItems) => {
 
         const info = await transporter.sendMail({
             from: process.env.MAIL_ACCOUNT, // Địa chỉ email người gửi
-            to: "quocviet081107@gmail.com", //kimhue12103008@gmail.com minhnvhe173072@fpt.edu.vn Địa chỉ email người nhận  anhdthhs176249@fpt.edu.vnnttuyet99@gmail.com
+            to: "minhnvhe173072@fpt.edu.vn", //quocviet081107@gmail.com kimhue12103008@gmail.com minhnvhe173072@fpt.edu.vn Địa chỉ email người nhận  anhdthhs176249@fpt.edu.vnnttuyet99@gmail.com
             subject: "Đặt hàng thành công", // Chủ đề
             html: emailHTML, // Nội dung email dạng HTML
         });

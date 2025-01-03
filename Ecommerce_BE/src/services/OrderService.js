@@ -130,7 +130,7 @@ const createOrder = (newOrder) => {
                     // Nếu sản phẩm không đủ hàng, trả lỗi
                     return resolve({
                         status: "ERR",
-                        message: `Sản phẩm với ID ${order.product.name} không đủ hàng.`,
+                        message: `Sản phẩm với ID ${order.product} không đủ hàng.`,
                     });
                 }
             }
