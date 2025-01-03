@@ -1,3 +1,5 @@
+import { orderContant } from "./contant";
+
 export const isJsonString = (data) => {
     try {
         JSON.parse(data);
@@ -69,4 +71,75 @@ export const initFacebookSDK = () => {
             resolve();
         };
     });
+};
+
+// export const converDataChart = (data, type) => {
+//     try {
+//         const object = {};
+//         Array.isArray(data) &&
+//             data.forEach((opt) => {
+//                 console.log("Current type:", type, "Value:", opt[type]);
+
+//                 console.log("opt:", opt, type);
+//                 console.log(
+//                     "paymentMethod:",
+//                     opt["paymentMethod"],
+//                     object[opt["paymentMethod"]]
+//                 );
+//                 if (!object[opt[type]]) {
+//                     object[opt[type]] = 1;
+//                 } else {
+//                     object[opt[type]] += 1;
+//                     console.log(
+//                         "getBase64",
+//                         object[opt[type]],
+//                         typeof object[opt[type]]
+//                     );
+//                 }
+//             });
+//         console.log("object:", object);
+//         const result =
+//             Array.isArray(Object.keys(object)) &&
+//             Object.keys(object).map((item) => {
+//                 return {
+//                     name: orderContant.payment[item] || item,
+//                     value: object[item],
+//                 };
+//             });
+//         console.log("result: ", result);
+//         return result;
+//     } catch (error) {
+//         console.error("Error in converDataChart:", error);
+//         return [];
+//     }
+// };
+
+export const convertDataChart = (data, type) => {
+    try {
+        const object = {};
+        Array.isArray(data) &&
+            data.forEach((opt) => {
+                if (!object[opt[type]]) {
+                    object[opt[type]] = 1;
+                } else {
+                    object[opt[type]] += 1;
+                    console.log(
+                        "c;getBase64",
+                        object[opt[type]],
+                        typeof object[opt[type]]
+                    );
+                }
+            });
+        const results =
+            Array.isArray(Object.keys(object)) &&
+            Object.keys(object).map((item) => {
+                return {
+                    name: orderContant.payment[item],
+                    value: object[item],
+                };
+            });
+        return results;
+    } catch (e) {
+        return [];
+    }
 };

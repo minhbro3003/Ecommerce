@@ -10,7 +10,7 @@ import TableComponent from "../TableComponent/TableComponent";
 import { WrapperHeader } from "./style";
 import InputComponent from "../InputComponent/InputComponent";
 import { WrapperUploadFile } from "../../pages/ProfilePage/style";
-import { getBase64, renderOptions } from "../../utils";
+import { convertPrice, getBase64, renderOptions } from "../../utils";
 import * as ProductService from "../../services/ProductService";
 import { useMutationHooks } from "../../hooks/useMutationHook";
 import * as message from "../../components/Message/Message";
@@ -473,7 +473,7 @@ const AdminProduct = () => {
                     >
                         Reset
                     </Button>
-                    <Button
+                    {/* <Button
                         type="link"
                         size="small"
                         onClick={() => {
@@ -485,7 +485,7 @@ const AdminProduct = () => {
                         }}
                     >
                         Filter
-                    </Button>
+                    </Button> */}
                     <Button
                         type="link"
                         size="small"
@@ -531,6 +531,7 @@ const AdminProduct = () => {
         {
             title: "Price",
             dataIndex: "price",
+            render: (total) => convertPrice(total),
             sorter: (a, b) => a.price - b.price,
             filters: [
                 {
@@ -548,10 +549,6 @@ const AdminProduct = () => {
                 }
                 return record.price <= 10000000;
             },
-        },
-        {
-            title: "Discount",
-            dataIndex: "discount",
         },
         {
             title: "Rating",
@@ -573,6 +570,10 @@ const AdminProduct = () => {
                 }
                 return record.rating <= 5;
             },
+        },
+        {
+            title: "Discount",
+            dataIndex: "discount",
         },
         {
             title: "Type",

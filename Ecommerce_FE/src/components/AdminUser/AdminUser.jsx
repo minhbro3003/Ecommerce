@@ -113,14 +113,14 @@ const AdminUser = () => {
     const { isLoading: isLoadingUsers, data: users = [] } = queryUser;
 
     //delete product
-    useEffect(() => {
-        if (isSuccessDeleted && dataDeleted?.status === "OK") {
-            message.success("Xóa sản phẩm thành công!");
-            handleCancelDelete();
-        } else if (isErrorDeleted) {
-            message.error("Xóa sản phẩm thất bại!");
-        }
-    }, [isSuccessDeleted, isErrorDeleted, dataDeleted?.status]);
+    // useEffect(() => {
+    //     if (isSuccessDeleted && dataDeleted?.status === "OK") {
+    //         message.success("Xóa sản phẩm thành công!");
+    //         handleCancelDelete();
+    //     } else if (isErrorDeleted) {
+    //         message.error("Xóa sản phẩm thất bại!");
+    //     }
+    // }, [isSuccessDeleted, isErrorDeleted, dataDeleted?.status]);
 
     //update product
     useEffect(() => {
@@ -334,7 +334,7 @@ const AdminUser = () => {
                     >
                         Reset
                     </Button>
-                    <Button
+                    {/* <Button
                         type="link"
                         size="small"
                         onClick={() => {
@@ -346,7 +346,7 @@ const AdminUser = () => {
                         }}
                     >
                         Filter
-                    </Button>
+                    </Button> */}
                     <Button
                         type="link"
                         size="small"
@@ -366,30 +366,18 @@ const AdminUser = () => {
                 }}
             />
         ),
-        onFilter: (value, record) =>
-            record[dataIndex]
+        onFilter: (value, record) => {
+            const recordValue = record[dataIndex] || ""; // Xử lý giá trị null hoặc undefined
+            return recordValue
                 .toString()
                 .toLowerCase()
-                .includes(value.toLowerCase()),
+                .includes(value.toLowerCase());
+        },
         onFilterDropdownOpenChange: (visible) => {
             if (visible) {
                 setTimeout(() => searchInput.current?.select(), 100);
             }
         },
-        // render: (text) =>
-        //     searchedColumn === dataIndex ? (
-        //         <Highlighter
-        //             highlightStyle={{
-        //                 backgroundColor: "#ffc069",
-        //                 padding: 0,
-        //             }}
-        //             searchWords={[searchText]}
-        //             autoEscape
-        //             textToHighlight={text ? text.toString() : ""}
-        //         />
-        //     ) : (
-        //         text
-        //     ),
     });
 
     const columns = [
@@ -437,7 +425,7 @@ const AdminUser = () => {
         {
             title: "Address",
             dataIndex: "address",
-            // ...getColumnSearchProps("address"),
+            ...getColumnSearchProps("address"),
         },
         {
             title: "City",

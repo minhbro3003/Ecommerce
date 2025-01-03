@@ -80,7 +80,7 @@ const TableComponent = (props) => {
                     Export excel
                 </Button>
 
-                {rowSelectedKeys.length > 0 && (
+                {rowSelectedKeys.length > 1 && (
                     <span
                         style={{
                             marginLeft: "10px",
